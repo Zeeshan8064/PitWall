@@ -25,4 +25,18 @@ router.get('/:season', async (req, res) => {
   }
 });
 
+// Get lap times for a specific race
+router.get('/:season/:round/laps', async (req, res) => {
+  try {
+    const { season, round } = req.params;
+    const response = await fetch(
+      `${JOLPICA_BASE}/${season}/${round}/laps.json?limit=2000`
+    );
+    const data = await response.json() as any;
+    const laps = data.MRData.RaceTable.Races[0]?.Laps || [];
+    res.json({ success: true, laps });
+  } catch (error) {
+    res.status(500).json({ success: false, message: 'Failed to fetch laps' });
+  }
+});
 export default router;
