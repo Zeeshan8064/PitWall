@@ -39,4 +39,19 @@ router.get('/:season/:round/laps', async (req, res) => {
     res.status(500).json({ success: false, message: 'Failed to fetch laps' });
   }
 });
+
+// Get pit stops for a specific race
+router.get('/:season/:round/pitstops', async (req, res) => {
+  try {
+    const { season, round } = req.params;
+    const response = await fetch(
+      `${JOLPICA_BASE}/${season}/${round}/pitstops.json?limit=100`
+    );
+    const data = await response.json() as any;
+    const pitstops = data.MRData.RaceTable.Races[0]?.PitStops || [];
+    res.json({ success: true, pitstops });
+  } catch (error) {
+    res.status(500).json({ success: false, message: 'Failed to fetch pit stops' });
+  }
+});
 export default router;
