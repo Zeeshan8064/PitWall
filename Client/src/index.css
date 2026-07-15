@@ -1,1 +1,31 @@
 @import "tailwindcss";
+
+/* tumhari existing global styles */
+
+body {
+  background: #050505;
+  color: white;
+}
+
+/* -------------------------------- */
+/* Strategy Feed Animation */
+/* -------------------------------- */
+
+@keyframes marquee {
+  from {
+    transform: translateX(0%);
+  }
+
+  to {
+    transform: translateX(-50%);
+  }
+}
+
+.animate-marquee {
+  width: max-content;
+  animation: marquee 28s linear infinite;
+}
+
+.animate-marquee:hover {
+  animation-play-state: paused;
+}

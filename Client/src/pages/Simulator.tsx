@@ -109,7 +109,6 @@ useEffect(() => {
   };
   fetchAll();
 }, [season]);
-// Race change hone pe — sessionKey change
 useEffect(() => {
   if (!sessionKey) return;
   const fetchRaceData = async () => {
@@ -139,7 +138,6 @@ useEffect(() => {
   const runSim = () => {
     if (!driverA || !driverB) return;
 
-    // Driver A aur B ke laps nikalo
     const lapsA = laps
       .filter(l => l.driverNumber === driverA && !l.isPitOutLap)
       .sort((a, b) => a.lapNumber - b.lapNumber);
@@ -147,8 +145,6 @@ useEffect(() => {
     const lapsB = laps
       .filter(l => l.driverNumber === driverB && !l.isPitOutLap)
       .sort((a, b) => a.lapNumber - b.lapNumber);
-
-    // Common laps dhundo
     const lapNumsB = new Set(lapsB.map(l => l.lapNumber));
     const commonLapsA = lapsA.filter(l => lapNumsB.has(l.lapNumber));
     const commonLapsB = lapsB.filter(l =>
@@ -160,8 +156,6 @@ useEffect(() => {
     const lapNums = commonLapsA.map(l => l.lapNumber);
     const seriesA = commonLapsA.map(l => l.lapDuration);
     const seriesB = commonLapsB.map(l => l.lapDuration);
-
-    // Driver A ka stint at pitLap
     const stintsA = stints
       .filter(s => s.driverNumber === driverA)
       .sort((a, b) => a.stintNumber - b.stintNumber);
@@ -173,7 +167,6 @@ useEffect(() => {
     const hypotheticalCompound = currentStint?.compound ?? 'HARD';
     const maxTyreLife = TYRE_MAX_LIFE[hypotheticalCompound] ?? 40;
 
-    // Degradation model — Driver A ke us stint ke laps se
     const stintLaps = commonLapsA
       .filter(l =>
         currentStint
@@ -186,7 +179,6 @@ useEffect(() => {
       stintLaps.length >= 5 ? stintLaps : commonLapsA.map((l, i) => ({ age: i, time: l.lapDuration }))
     );
 
-    // Pit loss — Driver A ka actual pit duration at pitLap
     const pitsA = pitstops
       .filter(p => p.driverNumber === driverA)
       .sort((a, b) => a.lapNumber - b.lapNumber);
@@ -194,13 +186,12 @@ useEffect(() => {
     const relevantPit = pitsA.find(p => p.lapNumber >= pitLap) ?? pitsA[pitsA.length - 1];
     const pitLoss = relevantPit?.pitDuration ?? 21;
 
-    // Actual gap — lap by lap
     let actualGap = 0;
     for (let i = 0; i < seriesA.length; i++) {
       actualGap += seriesA[i] - seriesB[i];
     }
 
-    // Simulated gap
+
     let simGap = 0;
     let tyreAge = 0;
     let pitted = false;
@@ -210,13 +201,11 @@ useEffect(() => {
       let lapTimeA: number;
 
       if (!pitted && lapNum >= pitLap) {
-        // Pit lap
         lapTimeA = base + pitLoss;
         tyreAge = 0;
         pitted = true;
       } else if (pitted) {
         tyreAge++;
-        // Tyre cliff check
         const cliffPenalty = tyreAge > maxTyreLife
           ? (tyreAge - maxTyreLife) * 0.4
           : 0;
