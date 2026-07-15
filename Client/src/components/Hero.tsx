@@ -9,8 +9,6 @@ export default function Hero() {
     bg-[#050505]
   "
 >
-      {/* Background */}
-      <div className="absolute inset-0 bg-[radial-gradient(circle_at_top_right,#991b1b20,transparent_40%)]" />
 
       <div className="relative z-10 mx-auto flex w-full max-w-7xl items-center justify-between gap-16 px-8">
         {/* Left Side */}

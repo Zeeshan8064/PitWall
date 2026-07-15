@@ -8,11 +8,16 @@ export default function HorizontalScroller({ children }: Props) {
   const items = React.Children.toArray(children);
   const total = items.length;
 
-  const [current, setCurrent] = useState(0);
+  const [current, setCurrent] = useState(() => {
+  const saved = sessionStorage.getItem("landing-section");
+  return saved ? Number(saved) : 0;
+});
 
   const locked = useRef(false);
   const wheelEndTimeout = useRef<ReturnType<typeof setTimeout> | null>(null);
-
+useEffect(() => {
+  sessionStorage.setItem("landing-section", current.toString());
+}, [current]);
   useEffect(() => {
     const wheel = (e: WheelEvent) => {
       e.preventDefault();

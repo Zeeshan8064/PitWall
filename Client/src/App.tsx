@@ -1,10 +1,12 @@
 import { BrowserRouter, Routes, Route } from "react-router-dom";
 
 import Landing from "./pages/Landing";
-import Home from "./pages/Home";
 import Race from "./pages/Race";
 import Driver from "./pages/Driver";
-import Simulator from "./pages/Simulator";
+import RaceStrategy from "./pages/RaceStrategy";
+import DriverAnalysis from "./pages/DriverAnalysis";
+import CarPerformance from "./pages/CarPerformance";
+import StrategySimulator from "./pages/StrategySimulator";
 
 function App() {
   return (
@@ -12,23 +14,19 @@ function App() {
       <div className="bg-gray-900">
         <Routes>
           <Route path="/" element={<Landing />} />
-
-          <Route path="/races" element={<Home />} />
-
-          <Route
-            path="/race/:sessionKey"
-            element={<Race />}
-          />
-
+          <Route path="/race/:sessionKey" element={<Race />} />
           <Route
             path="/race/:sessionKey/driver/:driverNumber"
             element={<Driver />}
           />
 
-          <Route
-            path="/simulator"
-            element={<Simulator />}
-          />
+          <Route path="/race-strategy" element={<RaceStrategy />} />
+
+          <Route path="/driver-analysis" element={<DriverAnalysis />} />
+
+          <Route path="/car-performance" element={<CarPerformance />} />
+
+          <Route path="/strategy-simulator" element={<StrategySimulator />} />
         </Routes>
       </div>
     </BrowserRouter>
