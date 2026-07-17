@@ -25,6 +25,9 @@ export interface OpenF1Lap {
   lap_number: number;
   lap_duration: number | null;
   is_pit_out_lap: boolean;
+  duration_sector_1: number | null;
+  duration_sector_2: number | null;
+  duration_sector_3: number | null;
 }
 
 export interface OpenF1Stint {
@@ -46,5 +49,15 @@ export interface OpenF1Interval {
   driver_number: number;
   gap_to_leader: number | null;
   interval: number | null;
+  date: string;
+}
+
+// OpenF1 has no dedicated "starting grid" endpoint. `/position` gives
+// driver position samples across the whole session — the earliest
+// sample per driver is used as their starting/grid position, and the
+// latest sample as their finishing position.
+export interface OpenF1Position {
+  driver_number: number;
+  position: number;
   date: string;
 }

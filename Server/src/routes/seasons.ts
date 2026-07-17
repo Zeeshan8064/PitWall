@@ -7,13 +7,6 @@ router.get("/season/:year", async (req, res) => {
   try {
     const year = Number(req.params.year);
 
-    if (isNaN(year)) {
-      return res.status(400).json({
-        success: false,
-        message: "Invalid year",
-      });
-    }
-
     const races = await getSeasonRaces(year);
 
     res.json({
@@ -21,13 +14,13 @@ router.get("/season/:year", async (req, res) => {
       races,
     });
   } catch (error) {
-    console.error(error);
+    console.error("FULL ERROR:", error);
 
     res.status(500).json({
       success: false,
-      message: "Failed to fetch races",
+      message: error instanceof Error ? error.message : String(error),
+      stack: error instanceof Error ? error.stack : undefined,
     });
   }
 });
-
 export default router;

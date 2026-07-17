@@ -6,6 +6,7 @@ import laps from "./laps";
 import stints from "./stints";
 import pitstops from "./pitstops";
 import intervals from "./intervals";
+import positions from "./positions";
 import raceData from "./raceData";
 
 const router = Router();
@@ -16,6 +17,7 @@ router.use(laps);
 router.use(stints);
 router.use(pitstops);
 router.use(intervals);
+router.use(positions);
 router.use(raceData);
 
 export default router;

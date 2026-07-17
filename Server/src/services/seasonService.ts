@@ -8,6 +8,9 @@ export async function getSeasonRaces(year: number) {
     const sessions = await fetchOpenF1<OpenF1Session>(
       `/sessions?year=${year}`
     );
+    console.log("Sessions fetched:", sessions.length);
+console.log("First session:", sessions[0]);
+console.log("Session names:", [...new Set(sessions.map(s => s.session_name))]);
 
     return sessions
       .filter(session => session.session_name === SESSION_TYPES.RACE)
