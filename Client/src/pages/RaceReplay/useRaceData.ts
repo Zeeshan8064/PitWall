@@ -10,7 +10,10 @@ import type {
 
 const API_BASE = "http://localhost:5000";
 
-export function useRaceData(sessionKey: string | undefined, isFutureRace: boolean) {
+export function useRaceData(
+  sessionKey: string | undefined,
+  isFutureRace: boolean,
+) {
   const [raceData, setRaceData] = useState<RaceData | null>(null);
   const [loading, setLoading] = useState(!isFutureRace);
   const [error, setError] = useState<string | null>(null);
@@ -23,8 +26,10 @@ export function useRaceData(sessionKey: string | undefined, isFutureRace: boolea
       setError(null);
       try {
         const res = await axios.get(
-          `${API_BASE}/api/races/${sessionKey}/race-data`
+          `${API_BASE}/api/races/${sessionKey}/race-data`,
         );
+        console.log(res.data);
+        console.log("Laps:", res.data.laps);
         setRaceData({
           drivers: res.data?.drivers ?? [],
           laps: res.data?.laps ?? [],
@@ -51,7 +56,8 @@ export function useRaceData(sessionKey: string | undefined, isFutureRace: boolea
   const { startPositionByDriver, finishPositionByDriver } = useMemo(() => {
     const start = new Map<number, { position: number; date: string }>();
     const finish = new Map<number, { position: number; date: string }>();
-    if (!raceData) return { startPositionByDriver: start, finishPositionByDriver: finish };
+    if (!raceData)
+      return { startPositionByDriver: start, finishPositionByDriver: finish };
 
     for (const row of raceData.positions) {
       const s = start.get(row.driverNumber);
@@ -68,7 +74,10 @@ export function useRaceData(sessionKey: string | undefined, isFutureRace: boolea
   }, [raceData]);
 
   const latestIntervalByDriver = useMemo(() => {
-    const map = new Map<number, { gapToLeader: number | string | null; date: string }>();
+    const map = new Map<
+      number,
+      { gapToLeader: number | string | null; date: string }
+    >();
     if (!raceData) return map;
     for (const row of raceData.intervals) {
       const existing = map.get(row.driverNumber);
@@ -97,10 +106,14 @@ export function useRaceData(sessionKey: string | undefined, isFutureRace: boolea
     const rows: ClassificationRow[] = raceData.drivers.map((d) => ({
       driver: driverByNumber.get(d.driverNumber),
       driverNumber: d.driverNumber,
-      finishPosition: finishPositionByDriver.get(d.driverNumber)?.position ?? null,
-      startPosition: startPositionByDriver.get(d.driverNumber)?.position ?? null,
-      gapToLeader: latestIntervalByDriver.get(d.driverNumber)?.gapToLeader ?? null,
-      currentCompound: latestStintByDriver.get(d.driverNumber)?.compound ?? null,
+      finishPosition:
+        finishPositionByDriver.get(d.driverNumber)?.position ?? null,
+      startPosition:
+        startPositionByDriver.get(d.driverNumber)?.position ?? null,
+      gapToLeader:
+        latestIntervalByDriver.get(d.driverNumber)?.gapToLeader ?? null,
+      currentCompound:
+        latestStintByDriver.get(d.driverNumber)?.compound ?? null,
     }));
 
     const havePositions = rows.some((r) => r.finishPosition !== null);
@@ -109,13 +122,30 @@ export function useRaceData(sessionKey: string | undefined, isFutureRace: boolea
       if (havePositions) {
         return (a.finishPosition ?? 999) - (b.finishPosition ?? 999);
       }
-      const av = typeof a.gapToLeader === "number" ? a.gapToLeader : a.gapToLeader ? 999999 : 0;
-      const bv = typeof b.gapToLeader === "number" ? b.gapToLeader : b.gapToLeader ? 999999 : 0;
+      const av =
+        typeof a.gapToLeader === "number"
+          ? a.gapToLeader
+          : a.gapToLeader
+            ? 999999
+            : 0;
+      const bv =
+        typeof b.gapToLeader === "number"
+          ? b.gapToLeader
+          : b.gapToLeader
+            ? 999999
+            : 0;
       return av - bv;
     });
 
     return rows;
-  }, [raceData, driverByNumber, finishPositionByDriver, startPositionByDriver, latestIntervalByDriver, latestStintByDriver]);
+  }, [
+    raceData,
+    driverByNumber,
+    finishPositionByDriver,
+    startPositionByDriver,
+    latestIntervalByDriver,
+    latestStintByDriver,
+  ]);
 
   const fastestLap = useMemo(() => {
     if (!raceData) return null;
@@ -124,7 +154,9 @@ export function useRaceData(sessionKey: string | undefined, isFutureRace: boolea
       if (lap.isPitOutLap || lap.lapDuration === null) continue;
       if (!best || lap.lapDuration! < best.lapDuration!) best = lap;
     }
-    return best ? { lap: best, driver: driverByNumber.get(best.driverNumber) } : null;
+    return best
+      ? { lap: best, driver: driverByNumber.get(best.driverNumber) }
+      : null;
   }, [raceData, driverByNumber]);
 
   const fastestSectors = useMemo(() => {
@@ -138,7 +170,10 @@ export function useRaceData(sessionKey: string | undefined, isFutureRace: boolea
         if (!best || value < (best[key] as number)) best = lap;
       }
       return best
-        ? { value: best[key] as number, driver: driverByNumber.get(best.driverNumber) }
+        ? {
+            value: best[key] as number,
+            driver: driverByNumber.get(best.driverNumber),
+          }
         : null;
     };
 
@@ -152,56 +187,67 @@ export function useRaceData(sessionKey: string | undefined, isFutureRace: boolea
       if (stop.pitDuration === null) continue;
       if (!best || stop.pitDuration! < best.pitDuration!) best = stop;
     }
-    return best ? { stop: best, driver: driverByNumber.get(best.driverNumber) } : null;
+    return best
+      ? { stop: best, driver: driverByNumber.get(best.driverNumber) }
+      : null;
   }, [raceData, driverByNumber]);
 
-  const pitLog = useMemo(() => {
-    if (!raceData) return [];
+const pitLog = useMemo(() => {
+  if (!raceData) return [];
 
-    // For each pit stop, find which stint started right after it
-    // so we can show the tyre the driver switched TO.
-    return [...raceData.pitstops]
-      .filter((p) => p.pitDuration !== null)
-      .sort((a, b) => a.lapNumber - b.lapNumber)
-      .map((stop) => {
-        const driverStints = raceData.stints
-          .filter((s) => s.driverNumber === stop.driverNumber)
-          .sort((a, b) => a.stintNumber - b.stintNumber);
+  return [...raceData.pitstops]
+    .filter((p) => p.pitDuration !== null)
+    .sort((a, b) => a.lapNumber - b.lapNumber)
+    .map((stop) => {
+      const driverStints = raceData.stints
+        .filter((s) => s.driverNumber === stop.driverNumber)
+        .sort((a, b) => a.stintNumber - b.stintNumber);
 
-        // The stint that started on or just after this pit lap = new tyre
-        const newStint = driverStints.find((s) => s.lapStart > stop.lapNumber);
-        // The stint just before = old tyre
-        const oldStint = driverStints
-          .filter((s) => s.lapStart <= stop.lapNumber)
-          .pop();
+      // Find the first stint that starts on or after the pit stop lap.
+      let nextIndex = driverStints.findIndex(
+        (s) => s.lapStart >= stop.lapNumber
+      );
 
-        return {
-          stop,
-          driver: driverByNumber.get(stop.driverNumber),
-          fromCompound: oldStint?.compound ?? null,
-          toCompound: newStint?.compound ?? null,
-        };
-      });
-  }, [raceData, driverByNumber]);
+      // Fallback in case OpenF1 records the new stint one lap later.
+      if (nextIndex === -1) {
+        nextIndex = driverStints.findIndex(
+          (s) => s.lapStart === stop.lapNumber + 1
+        );
+      }
+
+      const newStint =
+        nextIndex >= 0 ? driverStints[nextIndex] : null;
+
+      const oldStint =
+        nextIndex > 0 ? driverStints[nextIndex - 1] : driverStints[0] ?? null;
+
+      return {
+        stop,
+        driver: driverByNumber.get(stop.driverNumber),
+        fromCompound: oldStint?.compound ?? null,
+        toCompound: newStint?.compound ?? null,
+      };
+    });
+}, [raceData, driverByNumber]);
 
   // Plain function — not useMemo — so it always closes over the latest
   // raceData and classification without stale-closure issues.
-const buildLapSeries = (driverNumber: number) => {
-  if (!raceData) return [];
+  const buildLapSeries = (driverNumber: number) => {
+    if (!raceData) return [];
 
-  return raceData.laps
-    .filter(
-      (lap) =>
-        lap.driverNumber === driverNumber &&
-        lap.lapDuration != null &&
-        Number.isFinite(lap.lapDuration)
-    )
-    .sort((a, b) => a.lapNumber - b.lapNumber)
-    .map((lap) => ({
-      lap: lap.lapNumber,
-      time: lap.lapDuration!,
-    }));
-};
+    return raceData.laps
+      .filter(
+        (lap) =>
+          lap.driverNumber === driverNumber &&
+          lap.lapDuration != null &&
+          Number.isFinite(lap.lapDuration),
+      )
+      .sort((a, b) => a.lapNumber - b.lapNumber)
+      .map((lap) => ({
+        lap: lap.lapNumber,
+        time: lap.lapDuration!,
+      }));
+  };
 
   return {
     raceData,

@@ -1,5 +1,6 @@
 import { useEffect, useMemo, useState } from "react";
-import Navbar from "../components/Navbar";
+import Navbar from "../../components/Navbar";
+import Footer from "../../components/Footer";
 import DriverCard from "./DriverCard";
 
 interface Driver {
@@ -48,10 +49,6 @@ export default function Drivers() {
     () => new Set(drivers.map((driver) => driver.team)).size,
     [drivers]
   );
-
-  // Group drivers by team (in order of first appearance) so teammates always
-  // land next to each other in the 2-per-row grid, instead of whatever order
-  // the API happens to return.
   const groupedDrivers = useMemo(() => {
     const byTeam = new Map<string, Driver[]>();
 
@@ -160,6 +157,7 @@ export default function Drivers() {
           )}
         </section>
       </main>
+      <Footer/>
     </>
   );
 }

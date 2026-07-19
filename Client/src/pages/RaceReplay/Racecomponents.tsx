@@ -7,7 +7,7 @@ import {
   formatOrdinal,
   formatGap,
   COMPOUND_STYLES,
-} from "./F1utils";
+} from "./F1utils"
 
 // ─── Stat Cards ────────────────────────────────────────────────────────────
 
@@ -90,6 +90,8 @@ export function LapTimeChartSection({
 }: LapTimeChartSectionProps) {
   const activeRow = classification.find((r) => r.driverNumber === activeDriverNumber);
   const points = activeDriverNumber !== null ? buildLapSeries(activeDriverNumber) : [];
+  console.log("Active Driver:", activeDriverNumber);
+console.log("Points:", points);
 
   const series =
     activeRow?.driver && points.length > 1
@@ -195,16 +197,14 @@ function LapTimeChart({
             .map((p, i) => `${i === 0 ? "M" : "L"} ${x(p.lap)} ${y(p.time)}`)
             .join(" ");
           return (
-            <path
-              key={s.driverNumber}
-              d={d}
-              fill="none"
-              stroke={s.color}
-              strokeWidth={2}
-              strokeLinejoin="round"
-              strokeLinecap="round"
-              opacity={0.9}
-            />
+<path
+    d={d}
+    fill="none"
+    stroke="#ff0000"
+    strokeWidth={8}
+    strokeLinecap="round"
+    strokeLinejoin="round"
+/>
           );
         })}
 

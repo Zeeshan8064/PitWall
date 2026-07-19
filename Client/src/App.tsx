@@ -1,12 +1,12 @@
 import { BrowserRouter, Routes, Route } from "react-router-dom";
 import Landing from "./pages/Landing";
-import Race from "./pages/Race";
-import Driver from "./pages/Driver";
+import Race from "./pages/RaceReplay/Race";
+import Driver from "./pages/Driver/Driver";
 import RaceStrategy from "./pages/RaceStrategy";
-import DriverAnalysis from "./pages/DriverAnalysis";
+import DriverAnalysis from "./pages/DriveraAnalysis/DriverAnalysis";
 import CarPerformance from "./pages/CarPerformance";
-import StrategySimulator from "./pages/StrategySimulator";
-import RaceReplay from "./pages/RaceReplay"
+import StrategySimulator from "./pages/StrategySim/StrategySimulator";
+import RaceReplay from "./pages/RaceReplay/RaceReplay"
 
 
 function App() {

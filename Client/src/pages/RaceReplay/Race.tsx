@@ -1,6 +1,7 @@
 import { useState } from "react";
 import { useParams, useLocation, useNavigate } from "react-router-dom";
-import Navbar from "../components/Navbar";
+import Navbar from "../../components/Navbar";
+import Footer from "../../components/Footer";
 import type { RaceMeta } from "./raceTypes";
 import { useRaceData } from "./useRaceData";
 import {
@@ -40,7 +41,7 @@ export default function Race() {
 
   return (
     <>
-      <Navbar />
+      <Navbar/>
 
       <main className="min-h-screen bg-[#0A0A0A] px-8 pb-16 pt-28 text-white">
         <button
@@ -137,6 +138,7 @@ export default function Race() {
           </>
         )}
       </main>
+      <Footer/>
     </>
   );
 }
