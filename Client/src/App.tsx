@@ -2,9 +2,9 @@ import { BrowserRouter, Routes, Route } from "react-router-dom";
 import Landing from "./pages/Landing";
 import Race from "./pages/RaceReplay/Race";
 import Driver from "./pages/Driver/Driver";
-import RaceStrategy from "./pages/RaceStrategy";
+import RaceStrategy from "./pages/RaceStrat/RaceStrategy";
 import DriverAnalysis from "./pages/DriveraAnalysis/DriverAnalysis";
-import CarPerformance from "./pages/CarPerformance";
+import CarPerformance from "./pages/CarPerformance/CarPerformance";
 import StrategySimulator from "./pages/StrategySim/StrategySimulator";
 import RaceReplay from "./pages/RaceReplay/RaceReplay"
 

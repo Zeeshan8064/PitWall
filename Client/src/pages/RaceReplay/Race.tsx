@@ -37,12 +37,11 @@ export default function Race() {
   const activeDriverNumber = selectedDriverNumber ?? winner?.driverNumber ?? null;
 
   const iso = meta ? getCountryIso(meta.countryCode, meta.country) : null;
-  const trackShape = getTrackShape(meta?.circuit ?? sessionKey ?? "default");
+  const trackShape = getTrackShape(meta?.circuit ?? sessionKey ?? "default"); 
 
   return (
     <>
       <Navbar/>
-
       <main className="min-h-screen bg-[#0A0A0A] px-8 pb-16 pt-28 text-white">
         <button
           onClick={() => navigate("/race-replay")}

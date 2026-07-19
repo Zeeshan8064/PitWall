@@ -2,6 +2,8 @@ import { useEffect, useState } from "react";
 import { useNavigate } from "react-router-dom";
 import axios from "axios";
 import { getCountryIso, formatDateShort, TRACK_SHAPES } from "./F1utils";
+import Navbar from "../../components/Navbar"
+import Footer from "../../components/Footer"
 
 const API_BASE = "http://localhost:5000";
 const SEASONS = ["2026", "2025", "2024", "2023"];
@@ -41,6 +43,8 @@ function RaceReplay() {
   }, [season]);
 
   return (
+    <>
+    <Navbar/>
     <div className="min-h-screen bg-[#0A0A0A] p-8">
       <div className="mb-10 flex flex-wrap items-end justify-between gap-6 border-b border-neutral-800 pb-8">
         <div>
@@ -190,6 +194,8 @@ function RaceReplay() {
         </div>
       )}
     </div>
+    <Footer/>
+    </>
   );
 }
 
