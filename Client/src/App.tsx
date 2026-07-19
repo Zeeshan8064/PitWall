@@ -8,6 +8,7 @@ import CarPerformance from "./pages/CarPerformance";
 import StrategySimulator from "./pages/StrategySimulator";
 import RaceReplay from "./pages/RaceReplay"
 
+
 function App() {
   return (
     <BrowserRouter>
@@ -21,6 +22,7 @@ function App() {
           <Route path="/car-performance" element={<CarPerformance />} />
           <Route path="/strategy-simulator" element={<StrategySimulator />} />
           <Route path="/race-replay" element={<RaceReplay />} />
+          <Route path="/drivers" element={<Driver/>}/>
         </Routes>
       </div>
     </BrowserRouter>

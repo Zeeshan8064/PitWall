@@ -21,3 +21,21 @@ console.log("Session names:", [...new Set(sessions.map(s => s.session_name))]);
     throw error;
   }
 }
+
+let cachedDriverSession: number | null = null;
+
+export async function getSeasonDriverSession(year: number) {
+  if (cachedDriverSession) {
+    return cachedDriverSession;
+  }
+
+  const races = await getSeasonRaces(year);
+
+  if (races.length === 0) {
+    throw new Error(`No race sessions found for ${year}`);
+  }
+
+  cachedDriverSession = races[0].sessionKey;
+
+  return cachedDriverSession;
+}

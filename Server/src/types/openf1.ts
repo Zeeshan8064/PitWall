@@ -14,10 +14,13 @@ export interface OpenF1Session {
 export interface OpenF1Driver {
   driver_number: number;
   full_name: string;
+  first_name?: string;
+  last_name?: string;
   name_acronym: string;
   team_name: string;
   team_colour: string;
   headshot_url: string;
+  country_code?: string;
 }
 
 export interface OpenF1Lap {
