@@ -12,8 +12,7 @@ const API_BASE = "http://localhost:5000";
 
 export function useRaceData(
   sessionKey: string | undefined,
-  isFutureRace: boolean,
-) {
+  isFutureRace: boolean){
   const [raceData, setRaceData] = useState<RaceData | null>(null);
   const [loading, setLoading] = useState(!isFutureRace);
   const [error, setError] = useState<string | null>(null);
@@ -230,8 +229,6 @@ const pitLog = useMemo(() => {
     });
 }, [raceData, driverByNumber]);
 
-  // Plain function — not useMemo — so it always closes over the latest
-  // raceData and classification without stale-closure issues.
   const buildLapSeries = (driverNumber: number) => {
     if (!raceData) return [];
 

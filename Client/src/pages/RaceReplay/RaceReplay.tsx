@@ -45,7 +45,7 @@ function RaceReplay() {
   return (
     <>
     <Navbar/>
-    <div className="min-h-screen bg-[#0A0A0A] p-8">
+    <div className="min-h-screen bg-[#0A0A0A] pt-28">
       <div className="mb-10 flex flex-wrap items-end justify-between gap-6 border-b border-neutral-800 pb-8">
         <div>
           <p className="mb-2 text-xs font-bold uppercase tracking-[0.35em] text-red-500">

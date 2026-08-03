@@ -1,12 +1,22 @@
-import { OPENF1_BASE } from "../constants";
-import { fetchOpenF1 } from "../lib";
-import { mapStint } from "../mappers";
-import { OpenF1Stint } from "../types";
+import { Stint } from "../models";
+import { requireRaceIdBySessionKey } from "./raceLookup";
 
 export async function getStints(sessionKey: number) {
-  const stints = await fetchOpenF1<OpenF1Stint>(
-    `/stints?session_key=${sessionKey}`
-  );
+  const raceId = await requireRaceIdBySessionKey(sessionKey);
 
-  return stints.map(mapStint);
+  const stints: any[] = await Stint.find({ race: raceId })
+    .populate("driver", "driverNumber")
+    .sort({ stintNumber: 1 })
+    .lean();
+
+  return stints
+    .filter((stint) => stint.driver)
+    .map((stint) => ({
+      driverNumber: stint.driver.driverNumber,
+      stintNumber: stint.stintNumber,
+      lapStart: stint.lapStart,
+      lapEnd: stint.lapEnd,
+      compound: stint.compound,
+      tyreAgeAtStart: stint.tyreAgeAtStart,
+    }));
 }

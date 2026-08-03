@@ -1,24 +1,24 @@
-import { OPENF1_BASE } from "../constants";
-import { fetchOpenF1 } from "../lib";
-import { mapLap } from "../mappers";
-import { OpenF1Lap } from "../types";
+import { Lap } from "../models";
+import { requireRaceIdBySessionKey } from "./raceLookup";
 
 export async function getLaps(sessionKey: number) {
-  try {
-    const laps = await fetchOpenF1<OpenF1Lap>(
-      `/laps?session_key=${sessionKey}`
-    );
+  const raceId = await requireRaceIdBySessionKey(sessionKey);
 
-    return laps
-      .filter(
-        lap =>
-          lap.lap_duration !== null &&
-          lap.lap_duration < 150
-      )
-      .map(mapLap);
+  const laps: any[] = await Lap.find({ race: raceId })
+    .populate("driver", "driverNumber")
+    .sort({ lapNumber: 1 })
+    .lean();
 
-  } catch (error) {
-    console.error("Failed to fetch laps:", error);
-    throw error;
-  }
+  return laps
+    .filter((lap) => lap.driver)
+    .map((lap) => ({
+      driverNumber: lap.driver.driverNumber,
+      lapNumber: lap.lapNumber,
+      lapDuration: lap.lapDuration,
+      isPitOutLap: lap.isPitOutLap,
+      compound: lap.compound,
+      sector1: lap.durationSector1,
+      sector2: lap.durationSector2,
+      sector3: lap.durationSector3,
+    }));
 }

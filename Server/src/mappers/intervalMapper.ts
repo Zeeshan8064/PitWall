@@ -1,10 +1,17 @@
-import {OpenF1Interval} from "../types"
+import mongoose from "mongoose";
+import { OpenF1Interval } from "../types";
 
-export function mapInterval(interval: OpenF1Interval) {
+export function mapInterval(
+  interval: OpenF1Interval,
+  raceId: mongoose.Types.ObjectId,
+  driverId: mongoose.Types.ObjectId
+) {
   return {
-    driverNumber: interval.driver_number,
-    gapToLeader: interval.gap_to_leader,
+    race: raceId,
+    driver: driverId,
+    date: new Date(interval.date),
+    // Mixed on the schema: numeric seconds, or a string like "+1 LAP".
     interval: interval.interval,
-    date:interval.date,
+    gapToLeader: interval.gap_to_leader,
   };
 }

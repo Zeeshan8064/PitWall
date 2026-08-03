@@ -22,7 +22,7 @@ export default function Footer() {
         <div className="flex items-center gap-6 text-sm">
 
           <a
-            href="https://github.com/YOUR_USERNAME"
+            href="https://github.com/Zeeshan8064"
             target="_blank"
             rel="noopener noreferrer"
             className="text-neutral-500 transition hover:text-white"
@@ -31,7 +31,7 @@ export default function Footer() {
           </a>
 
           <a
-            href="https://linkedin.com/in/YOUR_USERNAME"
+            href="https://linkedin.com/in/zeeshanahmad8064"
             target="_blank"
             rel="noopener noreferrer"
             className="text-neutral-500 transition hover:text-white"

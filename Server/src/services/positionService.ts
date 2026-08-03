@@ -1,11 +1,20 @@
-import { fetchOpenF1 } from "../lib";
-import { mapPosition } from "../mappers";
-import { OpenF1Position } from "../types";
+import { Position } from "../models";
+import { requireRaceIdBySessionKey } from "./raceLookup";
 
 export async function getPositions(sessionKey: number) {
-  const positions = await fetchOpenF1<OpenF1Position>(
-    `/position?session_key=${sessionKey}`
-  );
+  const raceId = await requireRaceIdBySessionKey(sessionKey);
 
-  return positions.map(mapPosition);
+  const positions: any[] = await Position.find({ race: raceId })
+    .populate("driver", "driverNumber")
+    .sort({ date: 1 })
+    .lean();
+
+  return positions
+    .filter((row) => row.driver)
+    .map((row) => ({
+      driverNumber: row.driver.driverNumber,
+      position: row.position,
+      lapNumber: row.lapNumber,
+      date: row.date.toISOString(),
+    }));
 }

@@ -1,9 +1,19 @@
+import mongoose from "mongoose";
 import { OpenF1Position } from "../types";
 
-export function mapPosition(position: OpenF1Position) {
+// /position is a timestamped feed with no lap number, so lapNumber is resolved
+// by the caller against lap start times and may legitimately be null.
+export function mapPosition(
+  position: OpenF1Position,
+  raceId: mongoose.Types.ObjectId,
+  driverId: mongoose.Types.ObjectId,
+  lapNumber: number | null = null
+) {
   return {
-    driverNumber: position.driver_number,
+    race: raceId,
+    driver: driverId,
+    lapNumber,
     position: position.position,
-    date: position.date,
+    date: new Date(position.date),
   };
 }

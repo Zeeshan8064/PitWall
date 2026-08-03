@@ -27,15 +27,6 @@ export default function Navbar() {
 
           <li>
             <Link
-              to="/simulator"
-              className="transition-colors hover:text-white"
-            >
-              Simulator
-            </Link>
-          </li>
-
-          <li>
-            <Link
               to="/drivers"
               className="transition-colors hover:text-white"
             >
@@ -49,6 +40,14 @@ export default function Navbar() {
               className="transition-colors hover:text-white"
             >
               Championship
+            </Link>
+          </li>
+                    <li>
+            <Link
+              to="/simulator"
+              className="transition-colors hover:text-white"
+            >
+              Simulator
             </Link>
           </li>
 

@@ -1,14 +1,22 @@
-import { OPENF1_BASE } from "../constants";
-import { fetchOpenF1 } from "../lib";
-import { mapPitstop } from "../mappers";
-import { OpenF1Pit } from "../types";
+import { PitStop } from "../models";
+import { requireRaceIdBySessionKey } from "./raceLookup";
 
 export async function getPitstops(sessionKey: number) {
-  const pitstops = await fetchOpenF1<OpenF1Pit>(
-    `/pit?session_key=${sessionKey}`
-  );
+  const raceId = await requireRaceIdBySessionKey(sessionKey);
+
+  const pitstops: any[] = await PitStop.find({ race: raceId })
+    .populate("driver", "driverNumber")
+    .sort({ lap: 1 })
+    .lean();
 
   return pitstops
-    .filter(pit => pit.pit_duration !== null)
-    .map(mapPitstop);
+    .filter((stop) => stop.driver)
+    .map((stop) => ({
+      driverNumber: stop.driver.driverNumber,
+      lapNumber: stop.lap,
+      pitDuration: stop.pitDuration,
+      laneDuration: stop.laneDuration,
+      stopDuration: stop.stopDuration,
+      date: stop.date,
+    }));
 }

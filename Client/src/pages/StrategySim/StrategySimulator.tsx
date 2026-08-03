@@ -1,3 +1,4 @@
+import Footer from "../../components/Footer";
 import Navbar from "../../components/Navbar";
 export default function StrategySimulator(){
     return(
@@ -6,6 +7,7 @@ export default function StrategySimulator(){
             <div className="min-h-screen bg-[#0A0A0A] px-8 pt-28 pb-8">
             <h1 className="text-4xl font-bold">"Strategy Simulator"</h1>
         </div>
+        <Footer/>
         </>
 
     );

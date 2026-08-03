@@ -1,17 +1,23 @@
-import { OPENF1_BASE } from "../constants";
-import { fetchOpenF1 } from "../lib";
-import { mapInterval } from "../mappers";
-import { OpenF1Interval } from "../types";
+import { Interval } from "../models";
+import { requireRaceIdBySessionKey } from "./raceLookup";
 
 export async function getIntervals(sessionKey: number) {
-  const intervals = await fetchOpenF1<OpenF1Interval>(
-    `/intervals?session_key=${sessionKey}`,
-  );
+  const raceId = await requireRaceIdBySessionKey(sessionKey);
+
+  const intervals: any[] = await Interval.find({
+    race: raceId,
+    $or: [{ interval: { $ne: null } }, { gapToLeader: { $ne: null } }],
+  })
+    .populate("driver", "driverNumber")
+    .sort({ date: 1 })
+    .lean();
 
   return intervals
-    .filter(
-      (interval) =>
-        interval.interval !== null || interval.gap_to_leader !== null,
-    )
-    .map(mapInterval);
+    .filter((row) => row.driver)
+    .map((row) => ({
+      driverNumber: row.driver.driverNumber,
+      gapToLeader: row.gapToLeader,
+      interval: row.interval,
+      date: row.date.toISOString(),
+    }));
 }

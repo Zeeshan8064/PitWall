@@ -3,13 +3,17 @@
   "version": "1.0.0",
   "scripts": {
     "dev": "nodemon --exec ts-node src/index.ts",
+    "ingest": "ts-node src/scripts/ingestSeason.ts",
     "build": "tsc",
     "start": "node dist/index.js"
   },
   "dependencies": {
+    "axios": "^1.18.1",
     "cors": "^2.8.6",
     "dotenv": "^17.4.2",
-    "express": "^5.2.1"
+    "express": "^5.2.1",
+    "mongodb": "^7.5.0",
+    "mongoose": "^9.8.0"
   },
   "devDependencies": {
     "@types/cors": "^2.8.19",

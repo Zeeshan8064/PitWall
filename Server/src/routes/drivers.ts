@@ -1,5 +1,5 @@
 import { Router } from "express";
-import { getDrivers, getSeasonDriverSession} from "../services";
+import { getDrivers, getSeasonDriverSession, getDriverSeasonStats} from "../services";
 
 const router = Router();
 router.get("/drivers", async (req, res) => {
@@ -20,6 +20,34 @@ router.get("/drivers", async (req, res) => {
     });
   }
 });
+
+router.get("/drivers/:driverNumber", async (req, res) => {
+  try {
+    const driverNumber = Number(req.params.driverNumber);
+
+    if (isNaN(driverNumber)) {
+      return res.status(400).json({
+        success: false,
+        message: "Invalid driver number",
+      });
+    }
+
+    const stats = await getDriverSeasonStats(driverNumber);
+
+    res.json({
+      success: true,
+      stats,
+    });
+  } catch (error) {
+    console.error(error);
+
+    res.status(500).json({
+      success: false,
+      message: "Failed to fetch driver stats",
+    });
+  }
+});
+
 router.get("/:sessionKey/drivers", async (req, res) => {
   try {
     const sessionKey = Number(req.params.sessionKey);
@@ -43,5 +71,6 @@ router.get("/:sessionKey/drivers", async (req, res) => {
     });
   }
 });
+
 
 export default router;

@@ -64,8 +64,7 @@ export default function Drivers() {
   return (
     <>
       <Navbar />
-
-      <main className="min-h-screen bg-[#0A0A0A] text-white pt-8.5">
+      <main className="min-h-screen bg-[#0A0A0A] text-white pt-9">
         {/* Hero */}
         <section className="relative overflow-hidden border-b border-neutral-900">
           {/* Background glow */}

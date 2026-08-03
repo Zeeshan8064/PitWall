@@ -60,6 +60,11 @@ const IMAGE_STYLE: Record<
 
 export default function DriverCard({ driver }: DriverCardProps) {
   const flag = flagEmoji(driver.countryCode);
+  console.log({
+  name: driver.firstName,
+  countryCode: driver.countryCode,
+  flag: flagEmoji(driver.countryCode),
+});
 
   const imageStyle = IMAGE_STYLE[driver.driverNumber] ?? {
     right: "10%",
@@ -87,7 +92,7 @@ export default function DriverCard({ driver }: DriverCardProps) {
 
       {/* Team glow */}
       <div
-        className="absolute right-[-100px] top-1/2 h-[380px] w-[380px] -translate-y-1/2 rounded-full blur-[110px] opacity-35"
+        className="absolute -right-25 top-1/2 h-95 w-95 -translate-y-1/2 rounded-full blur-[110px] opacity-35"
         style={{
           background: driver.teamColour,
         }}

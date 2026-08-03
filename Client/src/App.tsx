@@ -7,6 +7,7 @@ import DriverAnalysis from "./pages/DriveraAnalysis/DriverAnalysis";
 import CarPerformance from "./pages/CarPerformance/CarPerformance";
 import StrategySimulator from "./pages/StrategySim/StrategySimulator";
 import RaceReplay from "./pages/RaceReplay/RaceReplay"
+import DriverProfile from "./pages/Driver/DriverProfile"
 
 
 function App() {
@@ -23,6 +24,7 @@ function App() {
           <Route path="/strategy-simulator" element={<StrategySimulator />} />
           <Route path="/race-replay" element={<RaceReplay />} />
           <Route path="/drivers" element={<Driver/>}/>
+          <Route path ="/drivers/:driverNumber" element={<DriverProfile/>}></Route>
         </Routes>
       </div>
     </BrowserRouter>
