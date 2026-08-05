@@ -1,11 +1,48 @@
 export interface RaceMeta {
   sessionKey: number;
+  meetingKey?: number;
   round?: number;
   raceName: string;
   circuit: string;
   country: string;
   countryCode: string;
   date: string;
+}
+
+export type SessionGroup = "grandPrix" | "sprint";
+
+export interface SessionSummary {
+  sessionKey: number;
+  sessionType: string;
+  // Display name — "Sprint Race" rather than OpenF1's "Sprint".
+  label: string;
+  group: SessionGroup;
+  date: string;
+  isFuture: boolean;
+}
+
+export interface MeetingMeta {
+  meetingKey: number;
+  season: number;
+  round: number;
+  raceName: string;
+  officialName: string;
+  circuit: string | null;
+  location: string | null;
+  country: string | null;
+  // Traced SVG path for the circuit, or null if it has not been generated.
+  circuitOutline: string | null;
+  date: string;
+}
+
+// What the weekend actually contains, as read from the database. A sprint
+// weekend is one whose sprint group is non-empty — the frontend never carries
+// a list of which rounds those are.
+export interface SessionContext {
+  meeting: MeetingMeta;
+  isSprintWeekend: boolean;
+  groups: Record<SessionGroup, SessionSummary[]>;
+  selected: SessionSummary | null;
 }
 
 export interface Driver {

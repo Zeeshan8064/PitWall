@@ -3,6 +3,9 @@ import { useEffect, useState } from "react";
 interface DriverStatsProps {
   driverNumber: number,
   teamColour: string;
+  // Supplied by DriverProfile, which already fetches it for the hero. Left
+  // optional so the component still stands alone if used elsewhere.
+  stats?: SeasonStats | null;
 }
 
 interface SeasonStats {
@@ -15,11 +18,17 @@ interface SeasonStats {
 export default function DriverStats({
   driverNumber,
   teamColour,
+  stats: providedStats,
 }: DriverStatsProps) {
 
-const [stats, setStats] = useState<SeasonStats | null>(null);
+const [fetchedStats, setFetchedStats] = useState<SeasonStats | null>(null);
+
+  const stats = providedStats ?? fetchedStats;
 
   useEffect(() => {
+    // Nothing to do when the parent already has the payload.
+    if (providedStats) return;
+
     async function loadStats() {
       try {
         const response = await fetch(
@@ -28,14 +37,14 @@ const [stats, setStats] = useState<SeasonStats | null>(null);
 
         const data = await response.json();
 
-        setStats(data.stats);
+        setFetchedStats(data.stats);
       } catch (err) {
         console.error(err);
       }
     }
 
     loadStats();
-  }, [driverNumber]);
+  }, [driverNumber, providedStats]);
 
   const statCards = [
     { label: "Race Starts", value: stats?.starts ?? "—" },

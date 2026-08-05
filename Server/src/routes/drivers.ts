@@ -1,11 +1,12 @@
 import { Router } from "express";
-import { getDrivers, getSeasonDriverSession, getDriverSeasonStats} from "../services";
+import { getDrivers, getAllDrivers, DRIVERS_PAGE_SEASON, getDriverSeasonStats} from "../services";
 
 const router = Router();
 router.get("/drivers", async (req, res) => {
   try {
-    const sessionKey = await getSeasonDriverSession(2026);
-    const drivers = await getDrivers(sessionKey);
+    // The full season grid, not the entry list of one race — a driver who only
+    // appeared later in the season would otherwise be missing.
+    const drivers = await getAllDrivers(DRIVERS_PAGE_SEASON);
 
     res.json({
       success: true,
@@ -32,11 +33,16 @@ router.get("/drivers/:driverNumber", async (req, res) => {
       });
     }
 
-    const stats = await getDriverSeasonStats(driverNumber);
+    const { season, stats, championship, timeline } =
+      await getDriverSeasonStats(driverNumber);
 
     res.json({
       success: true,
+      driverNumber,
+      season,
       stats,
+      championship,
+      timeline,
     });
   } catch (error) {
     console.error(error);

@@ -1,7 +1,7 @@
 import { useEffect, useState } from "react";
 import { useNavigate } from "react-router-dom";
 import axios from "axios";
-import { getCountryIso, formatDateShort, TRACK_SHAPES } from "./F1utils";
+import { getCountryIso, formatDateShort, resolveTrackShape } from "./F1utils";
 import Navbar from "../../components/Navbar"
 import Footer from "../../components/Footer"
 
@@ -10,12 +10,15 @@ const SEASONS = ["2026", "2025", "2024", "2023"];
 
 interface Race {
   sessionKey: number;
+  // The weekend, which the replay page expands into its full session list.
+  meetingKey: number;
   round: number;
   raceName: string;
   circuit: string;
   location: string;
   country: string;
   countryCode: string;
+  circuitOutline: string | null;
   date: string;
 }
 
@@ -109,7 +112,7 @@ function RaceReplay() {
       {!loading && !error && (
         <div className="grid grid-cols-1 gap-4 sm:grid-cols-2 lg:grid-cols-3">
           {races.map((race, index) => {
-            const trackShape = TRACK_SHAPES[index % TRACK_SHAPES.length];
+            const trackShape = resolveTrackShape(race.circuitOutline, index);
 
             return (
               <div
@@ -123,14 +126,15 @@ function RaceReplay() {
               >
                 {/* Decorative circuit outline */}
                 <svg
-                  viewBox="0 0 120 75"
+                  viewBox={trackShape.viewBox}
+                  preserveAspectRatio="xMidYMid meet"
                   className="pointer-events-none absolute -right-3 -top-1 h-24 w-40 text-neutral-700 opacity-40 transition-colors duration-300 group-hover:text-red-500/60"
                   fill="none"
                 >
                   <path
-                    d={trackShape}
+                    d={trackShape.path}
                     stroke="currentColor"
-                    strokeWidth="2.5"
+                    strokeWidth={trackShape.isReal ? 2 : 2.5}
                     strokeLinecap="round"
                     strokeLinejoin="round"
                   />

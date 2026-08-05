@@ -1,23 +1,24 @@
 import { Interval } from "../models";
-import { requireRaceIdBySessionKey } from "./raceLookup";
+import { getRaceContext } from "./raceLookup";
 
+// One row per driver per lap — see the downsampling note in ingestService.
 export async function getIntervals(sessionKey: number) {
-  const raceId = await requireRaceIdBySessionKey(sessionKey);
+  const { raceId, numberByDriverId } = await getRaceContext(sessionKey);
 
   const intervals: any[] = await Interval.find({
     race: raceId,
     $or: [{ interval: { $ne: null } }, { gapToLeader: { $ne: null } }],
   })
-    .populate("driver", "driverNumber")
-    .sort({ date: 1 })
+    .sort({ lapNumber: 1 })
     .lean();
 
   return intervals
-    .filter((row) => row.driver)
     .map((row) => ({
-      driverNumber: row.driver.driverNumber,
+      driverNumber: numberByDriverId.get(String(row.driver)),
+      lapNumber: row.lapNumber,
       gapToLeader: row.gapToLeader,
       interval: row.interval,
       date: row.date.toISOString(),
-    }));
+    }))
+    .filter((row) => row.driverNumber !== undefined);
 }

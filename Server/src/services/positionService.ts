@@ -1,20 +1,19 @@
 import { Position } from "../models";
-import { requireRaceIdBySessionKey } from "./raceLookup";
+import { getRaceContext } from "./raceLookup";
 
 export async function getPositions(sessionKey: number) {
-  const raceId = await requireRaceIdBySessionKey(sessionKey);
+  const { raceId, numberByDriverId } = await getRaceContext(sessionKey);
 
   const positions: any[] = await Position.find({ race: raceId })
-    .populate("driver", "driverNumber")
     .sort({ date: 1 })
     .lean();
 
   return positions
-    .filter((row) => row.driver)
     .map((row) => ({
-      driverNumber: row.driver.driverNumber,
+      driverNumber: numberByDriverId.get(String(row.driver)),
       position: row.position,
       lapNumber: row.lapNumber,
       date: row.date.toISOString(),
-    }));
+    }))
+    .filter((row) => row.driverNumber !== undefined);
 }

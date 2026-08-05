@@ -1,22 +1,37 @@
 import mongoose from "mongoose";
 
-// Every ingest write is an idempotent upsert keyed on the unique index the
-// schema already declares, so re-running an ingest is safe and cheap.
+interface UpsertOptions {
+  omitNull?: string[];
+}
+
 export async function upsertMany(
   model: mongoose.Model<any>,
   docs: Record<string, any>[],
-  keyOf: (doc: Record<string, any>) => Record<string, any>
+  keyOf: (doc: Record<string, any>) => Record<string, any>,
+  options: UpsertOptions = {}
 ) {
   if (docs.length === 0) return;
 
+  const omitNull = options.omitNull ?? [];
+
   await model.bulkWrite(
-    docs.map((doc) => ({
-      updateOne: {
-        filter: keyOf(doc),
-        update: { $set: doc },
-        upsert: true,
-      },
-    })),
+    docs.map((doc) => {
+      const update = { ...doc };
+
+      for (const field of omitNull) {
+        if (update[field] === null || update[field] === undefined) {
+          delete update[field];
+        }
+      }
+
+      return {
+        updateOne: {
+          filter: keyOf(doc),
+          update: { $set: update },
+          upsert: true,
+        },
+      };
+    }),
     { ordered: false }
   );
 }

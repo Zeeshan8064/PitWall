@@ -1,4 +1,8 @@
-import { RATE_LIMIT } from "../constants/api";
+import {
+  MIN_REQUEST_GAP_MS,
+  RATE_LIMIT,
+  RATE_LIMIT_PENALTY_COOLDOWN_MS,
+} from "../constants/api";
 
 function delay(ms: number) {
   return new Promise((resolve) => setTimeout(resolve, ms));
@@ -20,6 +24,14 @@ function waitTime(now: number) {
   const inSecond = history.filter((at) => now - at < RATE_LIMIT.secondWindowMs);
 
   let wait = 0;
+
+  // Even pacing. This is what keeps the stream smooth rather than bursting to
+  // the cap and then idling for the rest of the minute.
+  const last = history[history.length - 1];
+
+  if (last !== undefined) {
+    wait = Math.max(wait, last + MIN_REQUEST_GAP_MS - now);
+  }
 
   // If the window is full, we may go once its oldest relevant entry expires.
   if (inSecond.length >= RATE_LIMIT.perSecond) {
@@ -56,10 +68,21 @@ export function acquireSlot(): Promise<void> {
   return slot;
 }
 
+let lastPenaltyAt = 0;
+
 // After a 429 the server disagrees with our accounting, so drop our budget for
 // the current minute and let the windows refill from scratch.
+//
+// Concurrent requests get rate limited as a group, so repeat calls inside the
+// cooldown are the same event reported several times. Re-applying would keep
+// pushing the cooldown outward and turn one minute into several.
 export function penaliseRateLimit() {
   const now = Date.now();
 
+  if (now - lastPenaltyAt < RATE_LIMIT_PENALTY_COOLDOWN_MS) {
+    return;
+  }
+
+  lastPenaltyAt = now;
   history = Array.from({ length: RATE_LIMIT.perMinute }, () => now);
 }

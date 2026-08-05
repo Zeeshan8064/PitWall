@@ -1,10 +1,16 @@
 import mongoose from "mongoose";
 
-
+// A Driver is a *person*, and nothing about them that changes between seasons
+// lives here. Car number and team move with the seat, so they belong on
+// DriverEntry — see that model for why.
+//
+// Identity is the OpenF1 name acronym. Verified stable across 2023-2026: 29
+// distinct acronyms, none of which map to more than one full_name. full_name
+// itself is not usable as a key ("Kimi Antonelli" vs "Andrea Kimi Antonelli").
 const driverSchema = new mongoose.Schema(
   {
-    driverNumber: {
-      type: Number,
+    acronym: {
+      type: String,
       required: true,
       unique: true,
     },
@@ -19,7 +25,7 @@ const driverSchema = new mongoose.Schema(
       required: true,
     },
 
-    abbreviation: {
+    fullName: {
       type: String,
     },
 
@@ -31,19 +37,10 @@ const driverSchema = new mongoose.Schema(
     headshotUrl: {
       type: String,
     },
-
-    team: {
-      type: mongoose.Schema.Types.ObjectId,
-      ref: "Team",
-    },
   },
   {
     timestamps: true,
   }
 );
 
-
-export default mongoose.model(
-  "Driver",
-  driverSchema
-);
+export default mongoose.model("Driver", driverSchema);

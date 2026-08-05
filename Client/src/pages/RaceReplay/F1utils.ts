@@ -34,8 +34,30 @@ export const COUNTRY_NAME_TO_ISO: Record<string, string> = {
 // flag image (flagcdn.com) instead of relying on emoji flags — many
 // Windows/Chrome setups render flag emoji as plain two-letter text
 // instead of an actual flag icon.
+// OpenF1 reports driver nationality as a three-letter code (GBR, NED, MON),
+// which is not an ISO-3166 alpha-2 and so cannot be handed to a flag CDN
+// directly — "gbr" 404s where "gb" works. These are IOC-style codes and
+// several genuinely differ from the ISO alpha-3, so a mapping is required
+// rather than a truncation.
+export const DRIVER_CODE_TO_ISO: Record<string, string> = {
+  ARG: "AR", AUS: "AU", AUT: "AT", AZE: "AZ", BEL: "BE", BRA: "BR",
+  CAN: "CA", CHN: "CN", COL: "CO", CZE: "CZ", DEN: "DK", ESP: "ES",
+  EST: "EE", FIN: "FI", FRA: "FR", GBR: "GB", GER: "DE", HUN: "HU",
+  IND: "IN", IRL: "IE", ITA: "IT", JPN: "JP", KOR: "KR", MEX: "MX",
+  MON: "MC", MAS: "MY", NED: "NL", NZL: "NZ", POL: "PL", POR: "PT",
+  QAT: "QA", RSA: "ZA", RUS: "RU", SAU: "SA", SGP: "SG", SUI: "CH",
+  SWE: "SE", THA: "TH", UAE: "AE", USA: "US", VEN: "VE",
+};
+
 export function getCountryIso(countryCode?: string | null, country?: string | null) {
   if (countryCode && countryCode.length === 2) return countryCode.toLowerCase();
+
+  const fromDriverCode = countryCode
+    ? DRIVER_CODE_TO_ISO[countryCode.toUpperCase()]
+    : undefined;
+
+  if (fromDriverCode) return fromDriverCode.toLowerCase();
+
   const derived = country ? COUNTRY_NAME_TO_ISO[country] : undefined;
   return derived ? derived.toLowerCase() : null;
 }
@@ -99,6 +121,34 @@ export function getTrackShape(seed: number | string) {
       ? seed
       : seed.split("").reduce((sum, ch) => sum + ch.charCodeAt(0), 0);
   return TRACK_SHAPES[Math.abs(n) % TRACK_SHAPES.length];
+}
+
+// Real circuit outlines are traced from position telemetry at ingest and
+// normalised into a 100x100 box; the decorative doodles above are drawn for a
+// 120x75 one. Callers need the matching viewBox, so both travel together.
+//
+// The fallback stays until every circuit has been traced — a circuit ingested
+// before outlines existed, or one whose lap could not be closed, still gets a
+// shape rather than an empty corner.
+export interface TrackShape {
+  path: string;
+  viewBox: string;
+  isReal: boolean;
+}
+
+export function resolveTrackShape(
+  outline: string | null | undefined,
+  seed: number | string
+): TrackShape {
+  if (outline) {
+    return { path: outline, viewBox: "0 0 100 100", isReal: true };
+  }
+
+  return {
+    path: getTrackShape(seed),
+    viewBox: "0 0 120 75",
+    isReal: false,
+  };
 }
 
 // Sector times are always under a minute in practice — plain seconds

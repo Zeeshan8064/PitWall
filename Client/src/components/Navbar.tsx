@@ -36,6 +36,15 @@ export default function Navbar() {
 
           <li>
             <Link
+              to="/teams"
+              className="transition-colors hover:text-white"
+            >
+              Teams
+            </Link>
+          </li>
+
+          <li>
+            <Link
               to="/championship"
               className="transition-colors hover:text-white"
             >

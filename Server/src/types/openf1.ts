@@ -108,6 +108,19 @@ export interface OpenF1Position extends OpenF1Keys {
   date: string;
 }
 
+// Car position on track, sampled at roughly 3.7Hz. x/y/z are in decimetres on
+// a circuit-local grid — good for tracing a shape, not georeferenced.
+//
+// Never stored: ingest reduces a single lap of these to one SVG path and
+// discards the samples. See utils/trackOutline.
+export interface OpenF1Location extends OpenF1Keys {
+  driver_number: number;
+  date: string;
+  x: number | null;
+  y: number | null;
+  z: number | null;
+}
+
 // gap_to_leader / interval are numeric seconds for cars on the lead lap, but
 // become strings such as "+1 LAP" once a car is lapped.
 export interface OpenF1Interval extends OpenF1Keys {

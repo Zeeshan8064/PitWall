@@ -4,6 +4,7 @@ export { default as Circuit } from "./Circuit";
 export { default as ConstructorsChampionship } from "./ConstructorsChampionship";
 export { default as Driver } from "./Driver";
 export { default as DriverChampionship } from "./DriverChampionship";
+export { default as DriverEntry } from "./DriverEntry";
 export { default as Interval } from "./Interval";
 export { default as Lap } from "./Lap";
 export { default as PitStop } from "./PitStop";
