@@ -21,6 +21,13 @@
       property="og:description"
       content="Every stint, stop and tyre call from three seasons of racing, rebuilt from timing data and modelled lap by lap."
     />
+    <!-- 1200x630 screenshot of the app. Relative paths are resolved against
+         the page URL by every major crawler; an absolute URL would have to be
+         rebuilt whenever the domain changes. Until public/og.png exists this
+         tag simply yields a text-only preview. -->
+    <meta property="og:image" content="/og.png" />
+    <meta property="og:image:width" content="1200" />
+    <meta property="og:image:height" content="630" />
     <meta name="twitter:card" content="summary_large_image" />
   </head>
   <body>
