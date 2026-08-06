@@ -3,6 +3,7 @@ import { Link } from "react-router-dom";
 import Navbar from "../../components/Navbar";
 import Footer from "../../components/Footer";
 import DriverCard from "./DriverCard";
+import { API_BASE } from "../../lib/api";
 
 interface Driver {
   driverNumber: number;
@@ -28,9 +29,7 @@ export default function Drivers() {
   useEffect(() => {
     async function loadDrivers() {
       try {
-        const response = await fetch(
-          "http://localhost:5000/api/races/drivers"
-        );
+        const response = await fetch(`${API_BASE}/api/races/drivers`);
 
         if (!response.ok) {
           throw new Error("Failed to fetch drivers");

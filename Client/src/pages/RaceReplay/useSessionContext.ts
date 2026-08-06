@@ -1,8 +1,8 @@
 import { useEffect, useState } from "react";
 import axios from "axios";
 import type { SessionContext } from "./raceTypes";
+import { API_BASE } from "../../lib/api";
 
-const API_BASE = "http://localhost:5000";
 
 // Resolves a session key to the weekend it belongs to and every sibling
 // session. Keyed off the session rather than the meeting so a deep link to any

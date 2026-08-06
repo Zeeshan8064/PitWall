@@ -7,6 +7,13 @@ router.get("/season/:year", async (req, res) => {
   try {
     const year = Number(req.params.year);
 
+    if (isNaN(year)) {
+      return res.status(400).json({
+        success: false,
+        message: "Invalid season year",
+      });
+    }
+
     const races = await getSeasonRaces(year);
 
     res.json({
@@ -14,12 +21,14 @@ router.get("/season/:year", async (req, res) => {
       races,
     });
   } catch (error) {
-    console.error("FULL ERROR:", error);
+    // Logged in full server-side; the response carries no internals. This
+    // previously returned error.stack, which leaks file paths and structure
+    // to anyone who can trigger a failure.
+    console.error("Failed to fetch season:", error);
 
     res.status(500).json({
       success: false,
-      message: error instanceof Error ? error.message : String(error),
-      stack: error instanceof Error ? error.stack : undefined,
+      message: "Failed to fetch season",
     });
   }
 });

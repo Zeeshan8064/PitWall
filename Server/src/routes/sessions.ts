@@ -1,6 +1,7 @@
 import { Router } from "express";
 
 import { getMeetingSessions, getSessionContext } from "../services";
+import { describeError } from "../utils/httpError";
 
 const router = Router();
 
@@ -22,13 +23,11 @@ router.get("/meetings/:meetingKey/sessions", async (req, res) => {
       ...context,
     });
   } catch (error) {
-    console.error(error);
+    console.error("Failed to fetch sessions:", error);
 
-    res.status(500).json({
-      success: false,
-      message:
-        error instanceof Error ? error.message : "Failed to fetch sessions",
-    });
+    const { status, message } = describeError(error, "Failed to fetch sessions");
+
+    res.status(status).json({ success: false, message });
   }
 });
 
@@ -50,13 +49,11 @@ router.get("/:sessionKey/session-context", async (req, res) => {
       ...context,
     });
   } catch (error) {
-    console.error(error);
+    console.error("Failed to fetch session:", error);
 
-    res.status(500).json({
-      success: false,
-      message:
-        error instanceof Error ? error.message : "Failed to fetch session",
-    });
+    const { status, message } = describeError(error, "Failed to fetch session");
+
+    res.status(status).json({ success: false, message });
   }
 });
 

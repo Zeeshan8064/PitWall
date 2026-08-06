@@ -4,8 +4,8 @@ import Navbar from "../../components/Navbar";
 import Footer from "../../components/Footer";
 import { formatLapTime, formatSectorTime } from "../RaceReplay/F1utils";
 import type { Driver, Lap } from "../RaceReplay/raceTypes";
+import { API_BASE } from "../../lib/api";
 
-const API_BASE = "http://localhost:5000";
 const SEASONS = [2026, 2025, 2024];
 
 // A lap this far off a driver's own median is traffic or a mistake, not

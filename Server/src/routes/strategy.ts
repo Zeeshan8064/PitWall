@@ -1,6 +1,7 @@
 import { Router } from "express";
 
 import { getStrategyModel } from "../services";
+import { describeError } from "../utils/httpError";
 
 const router = Router();
 
@@ -22,19 +23,17 @@ router.get("/:sessionKey/strategy", async (req, res) => {
       ...model,
     });
   } catch (error) {
-    console.error(error);
+    console.error("Failed to build strategy model:", error);
 
-    const message =
-      error instanceof Error ? error.message : "Failed to build strategy model";
+    // A session with no laps, or one that is not a race, is a missing
+    // resource rather than a server fault — describeError makes that call and
+    // withholds the message for anything unexpected.
+    const { status, message } = describeError(
+      error,
+      "Failed to build strategy model"
+    );
 
-    // A session with no laps, or one that is not a race, is a bad request
-    // rather than a server fault.
-    const clientError =
-      message.includes("has not been ingested") ||
-      message.includes("only applies to race sessions") ||
-      message.includes("No lap data");
-
-    res.status(clientError ? 404 : 500).json({ success: false, message });
+    res.status(status).json({ success: false, message });
   }
 });
 

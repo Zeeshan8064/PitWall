@@ -5,6 +5,7 @@ import type { SeasonStats, TimelineRow } from "./DriverStats";
 import DriverHero from "./DriverHero";
 import Navbar from "../../components/Navbar";
 import Footer from "../../components/Footer";
+import { API_BASE } from "../../lib/api";
 
 interface Driver {
   driverNumber: number;
@@ -51,8 +52,8 @@ export default function DriverProfile() {
         // Fetching here rather than inside DriverStats means the hero and the
         // stats section share one request instead of making two.
         const [gridRes, seasonRes] = await Promise.all([
-          fetch("http://localhost:5000/api/races/drivers"),
-          fetch(`http://localhost:5000/api/races/drivers/${driverNumber}`),
+          fetch(`${API_BASE}/api/races/drivers`),
+          fetch(`${API_BASE}/api/races/drivers/${driverNumber}`),
         ]);
 
         const grid = await gridRes.json();

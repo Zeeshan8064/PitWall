@@ -13,8 +13,8 @@ import {
   type Stint,
   type StrategyModel,
 } from "./strategyModel";
+import { API_BASE } from "../../lib/api";
 
-const API_BASE = "http://localhost:5000";
 const SEASONS = [2026, 2025, 2024];
 
 interface RaceOption {

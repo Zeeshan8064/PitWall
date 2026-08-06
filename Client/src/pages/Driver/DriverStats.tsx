@@ -1,6 +1,7 @@
 import { useEffect, useState } from "react";
 import { Link } from "react-router-dom";
 import SeasonChart from "../Teams/SeasonChart";
+import { API_BASE } from "../../lib/api";
 
 // Canonical shapes for the /drivers/:number payload — imported by
 // DriverProfile rather than redeclared, so they cannot drift apart.
@@ -131,7 +132,7 @@ export default function DriverStats({
 
       try {
         const response = await fetch(
-          `http://localhost:5000/api/races/drivers/${driverNumber}?season=${scope}`
+          `${API_BASE}/api/races/drivers/${driverNumber}?season=${scope}`
         );
 
         const data = await response.json();

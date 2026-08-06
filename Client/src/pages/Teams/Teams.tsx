@@ -3,8 +3,8 @@ import axios from "axios";
 import Navbar from "../../components/Navbar";
 import Footer from "../../components/Footer";
 import TeamCard from "./TeamCard";
+import { API_BASE } from "../../lib/api";
 
-const API_BASE = "http://localhost:5000";
 const SEASON = 2026;
 
 interface Team {

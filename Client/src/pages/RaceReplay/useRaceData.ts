@@ -7,8 +7,7 @@ import type {
   Pitstop,
   RaceData,
 } from "./raceTypes";
-
-const API_BASE = "http://localhost:5000";
+import { API_BASE } from "../../lib/api";
 
 export function useRaceData(
   sessionKey: string | undefined,

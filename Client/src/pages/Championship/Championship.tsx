@@ -4,8 +4,8 @@ import axios from "axios";
 import Navbar from "../../components/Navbar";
 import Footer from "../../components/Footer";
 import { getCountryIso } from "../RaceReplay/F1utils";
+import { API_BASE } from "../../lib/api";
 
-const API_BASE = "http://localhost:5000";
 const SEASONS = [2026, 2025, 2024];
 
 type Table = "drivers" | "constructors";

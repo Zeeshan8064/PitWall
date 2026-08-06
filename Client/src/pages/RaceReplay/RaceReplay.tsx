@@ -4,8 +4,8 @@ import axios from "axios";
 import { getCountryIso, formatDateShort, resolveTrackShape } from "./F1utils";
 import Navbar from "../../components/Navbar"
 import Footer from "../../components/Footer"
+import { API_BASE } from "../../lib/api";
 
-const API_BASE = "http://localhost:5000";
 // Matches what the database actually holds. 2023 was deliberately excluded
 // from the rebuild — its data was bad — so offering it would only ever return
 // an empty season.

@@ -1,6 +1,7 @@
 import { Router } from "express";
 
 import { getTeamDetail, getTeams } from "../services";
+import { describeError } from "../utils/httpError";
 
 const DEFAULT_SEASON = 2026;
 
@@ -57,17 +58,12 @@ router.get("/teams/:slug", async (req, res) => {
       ...detail,
     });
   } catch (error) {
-    console.error(error);
+    console.error("Failed to fetch team:", error);
 
     // An unknown slug is a bad URL, not a server fault.
-    const notFound =
-      error instanceof Error && error.message.startsWith("No team matching");
+    const { status, message } = describeError(error, "Failed to fetch team");
 
-    res.status(notFound ? 404 : 500).json({
-      success: false,
-      message:
-        error instanceof Error ? error.message : "Failed to fetch team",
-    });
+    res.status(status).json({ success: false, message });
   }
 });
 

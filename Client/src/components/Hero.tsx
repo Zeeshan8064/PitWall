@@ -2,8 +2,8 @@ import { useEffect, useState } from "react";
 import { Link } from "react-router-dom";
 import axios from "axios";
 import PanelBackground from "./PanelBackground";
+import { API_BASE } from "../lib/api";
 
-const API_BASE = "http://localhost:5000";
 const SEASON = 2026;
 
 const COMPOUND_FILL: Record<string, string> = {
