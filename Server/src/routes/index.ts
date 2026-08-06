@@ -5,6 +5,7 @@ import drivers from "./drivers";
 import teams from "./teams";
 import championship from "./championship";
 import sessions from "./sessions";
+import strategy from "./strategy";
 import laps from "./laps";
 import stints from "./stints";
 import pitstops from "./pitstops";
@@ -21,6 +22,7 @@ router.use(teams);
 // must not be shadowed by a `/:sessionKey/...` pattern.
 router.use(championship);
 router.use(sessions);
+router.use(strategy);
 router.use(laps);
 router.use(stints);
 router.use(pitstops);

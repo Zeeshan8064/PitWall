@@ -7,6 +7,7 @@ export * from "./teamService";
 export * from "./championshipService";
 export * from "./seasonService";
 export * from "./sessionService";
+export * from "./strategyService";
 export * from "./lapService";
 export * from "./stintService";
 export * from "./pitstopService";

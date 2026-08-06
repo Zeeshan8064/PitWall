@@ -7,6 +7,7 @@ import {
   DriverEntry,
   Race,
 } from "../models";
+import { toSlug } from "../utils/slug";
 
 // Standings are stored per race, not per season — one document per driver (or
 // team) per round. "The season's standings" therefore means "the standings
@@ -176,6 +177,9 @@ async function serialiseConstructorStandings(race: RaceRef) {
       .filter((entry) => entry.team)
       .map((entry) => ({
         name: entry.team.name,
+        // Route identity, derived server-side so the client never has to
+        // reimplement slugging and risk the two drifting.
+        slug: toSlug(entry.team.name),
         shortName: entry.team.shortName ?? null,
         country: entry.team.country ?? null,
         colour: entry.team.color ?? "#666666",

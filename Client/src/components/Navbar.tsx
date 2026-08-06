@@ -13,8 +13,10 @@ export default function Navbar() {
           PITWALL
         </Link>
 
-        {/* Navigation */}
-        <ul className="flex items-center gap-10 text-sm font-medium text-neutral-400">
+        {/* Navigation. flex-1 + centre keeps the links balanced now that the
+            right-hand button is gone; justify-between alone would push them
+            against the edge. */}
+        <ul className="flex flex-1 items-center justify-center gap-10 text-sm font-medium text-neutral-400">
 
           <li>
             <Link
@@ -51,7 +53,33 @@ export default function Navbar() {
               Championship
             </Link>
           </li>
-                    <li>
+                    {/* Analysis pages live behind one item — seven top-level links is
+              more than the bar can carry legibly. */}
+          <li className="group relative">
+            <span className="cursor-default transition-colors group-hover:text-white">
+              Analysis
+            </span>
+
+            <ul className="invisible absolute left-1/2 top-full z-50 w-52 -translate-x-1/2 pt-4 opacity-0 transition-all duration-200 group-hover:visible group-hover:opacity-100">
+              <li className="overflow-hidden rounded-xl border border-neutral-800 bg-black/95 backdrop-blur-xl">
+                {[
+                  { to: "/race-strategy", label: "Race Strategy" },
+                  { to: "/driver-analysis", label: "Driver Analysis" },
+                  { to: "/car-performance", label: "Car Performance" },
+                ].map((item) => (
+                  <Link
+                    key={item.to}
+                    to={item.to}
+                    className="block border-b border-neutral-900 px-4 py-3 text-sm transition-colors last:border-0 hover:bg-neutral-900 hover:text-white"
+                  >
+                    {item.label}
+                  </Link>
+                ))}
+              </li>
+            </ul>
+          </li>
+
+          <li>
             <Link
               to="/simulator"
               className="transition-colors hover:text-white"
@@ -61,11 +89,6 @@ export default function Navbar() {
           </li>
 
         </ul>
-
-        {/* Sign In */}
-        <button className="rounded-xl border border-red-600 px-5 py-2 text-sm font-medium text-white transition-all duration-300 hover:bg-red-600">
-          Sign In
-        </button>
 
       </nav>
     </header>

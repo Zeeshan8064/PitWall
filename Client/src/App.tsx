@@ -10,6 +10,7 @@ import RaceReplay from "./pages/RaceReplay/RaceReplay"
 import DriverProfile from "./pages/Driver/DriverProfile"
 import Teams from "./pages/Teams/Teams"
 import TeamProfile from "./pages/Teams/TeamProfile"
+import Championship from "./pages/Championship/Championship"
 
 
 function App() {
@@ -24,11 +25,15 @@ function App() {
           <Route path="/driver-analysis" element={<DriverAnalysis />} />
           <Route path="/car-performance" element={<CarPerformance />} />
           <Route path="/strategy-simulator" element={<StrategySimulator />} />
+          {/* The navbar links here; /strategy-simulator is kept so existing
+              links do not break. */}
+          <Route path="/simulator" element={<StrategySimulator />} />
           <Route path="/race-replay" element={<RaceReplay />} />
           <Route path="/drivers" element={<Driver/>}/>
           <Route path ="/drivers/:driverNumber" element={<DriverProfile/>}></Route>
           <Route path="/teams" element={<Teams />} />
           <Route path="/teams/:slug" element={<TeamProfile />} />
+          <Route path="/championship" element={<Championship />} />
         </Routes>
       </div>
     </BrowserRouter>

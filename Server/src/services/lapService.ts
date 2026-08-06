@@ -18,6 +18,9 @@ export async function getLaps(sessionKey: number) {
       sector1: lap.durationSector1,
       sector2: lap.durationSector2,
       sector3: lap.durationSector3,
+      // Speed trap. Stored since the first ingest but never exposed — it is
+      // the only straightline-speed measure in the model.
+      stSpeed: lap.stSpeed ?? null,
     }))
     .filter((lap) => lap.driverNumber !== undefined);
 }

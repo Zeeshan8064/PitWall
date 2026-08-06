@@ -66,6 +66,8 @@ export interface Lap {
   sector1: number | null;
   sector2: number | null;
   sector3: number | null;
+  // Speed trap reading, the only straightline-speed measure in the model.
+  stSpeed?: number | null;
 }
 
 export interface Stint {
