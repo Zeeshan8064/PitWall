@@ -33,7 +33,9 @@ const COMPOUND_FILL: Record<string, string> = {
 };
 
 export default function StrategySimulator() {
-  const [season, setSeason] = useState(SEASONS[1]);
+  // Current season, matching every other page. Only races that have been
+  // run are listed, so a season in progress simply offers fewer.
+  const [season, setSeason] = useState(SEASONS[0]);
   const [races, setRaces] = useState<RaceOption[]>([]);
   const [sessionKey, setSessionKey] = useState<number | null>(null);
 

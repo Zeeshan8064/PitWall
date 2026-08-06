@@ -53,7 +53,9 @@ interface StrategyPayload {
 }
 
 export default function RaceStrategy() {
-  const [season, setSeason] = useState(SEASONS[1]);
+  // Current season, matching every other page. Only races that have been
+  // run are listed, so a season in progress simply offers fewer.
+  const [season, setSeason] = useState(SEASONS[0]);
   const [races, setRaces] = useState<RaceOption[]>([]);
   const [sessionKey, setSessionKey] = useState<number | null>(null);
   const [data, setData] = useState<StrategyPayload | null>(null);
