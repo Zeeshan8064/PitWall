@@ -5,8 +5,12 @@ import { NextFunction, Request, Response } from "express";
 // to stop one client hammering the expensive endpoints — /race-data returns
 // ~1,400 laps, /strategy fits a regression over every lap in a race.
 //
-// LIMITATION. State is per-process, so behind several instances each gets its
-// own allowance. Move to a shared store if this is ever scaled horizontally.
+// LIMITATION. State is per-process. On a single long-lived server this works
+// as intended. Behind several instances each gets its own allowance, and on
+// serverless — where every container has its own memory and containers come
+// and go — it stops limiting in any meaningful sense. It is not a security
+// control there; it only smooths bursts within one warm container. A shared
+// store (Redis, Upstash) is the fix if real throttling is needed.
 
 interface Options {
   windowMs?: number;
