@@ -27,6 +27,30 @@ interface RaceStatsProps {
   showPitStop?: boolean;
 }
 
+// Shared shell so every card carries the same rail, hairline and accent spine.
+function StatCard({
+  label,
+  accent,
+  children,
+}: {
+  label: string;
+  accent?: string;
+  children: React.ReactNode;
+}) {
+  return (
+    <div className="relative overflow-hidden rounded-2xl border border-neutral-800 bg-neutral-950 p-5">
+      <span
+        className="absolute left-0 top-0 h-full w-[3px]"
+        style={{ backgroundColor: accent ?? "#404040" }}
+      />
+      <p className="pl-2 font-mono text-[10px] uppercase tracking-[0.3em] text-neutral-500">
+        {label}
+      </p>
+      <div className="pl-2">{children}</div>
+    </div>
+  );
+}
+
 export function RaceStats({
   winner,
   fastestLap,
@@ -36,56 +60,67 @@ export function RaceStats({
   showStartPosition = true,
   showPitStop = true,
 }: RaceStatsProps) {
+  const winnerColour = winner?.driver?.teamColour
+    ? `#${winner.driver.teamColour}`
+    : undefined;
+
   return (
     <section className="mt-10 grid gap-4 md:grid-cols-4">
-      <div className="rounded-2xl border border-neutral-800 bg-neutral-900 p-5">
-        <p className="text-xs uppercase tracking-widest text-neutral-500">{leaderLabel}</p>
-        <p className="mt-3 text-xl font-bold">{winner?.driver?.fullName ?? "—"}</p>
-        {showStartPosition && (
-          <p className="mt-1 text-sm text-neutral-500">
-            Started {formatPosition(winner?.startPosition ?? null)}
-          </p>
-        )}
-      </div>
+      <StatCard label={leaderLabel} accent={winnerColour}>
+        <p className="mt-3 text-2xl font-black uppercase leading-none">
+          {winner?.driver?.lastName ?? winner?.driver?.fullName ?? "—"}
+        </p>
+        <p className="mt-2 font-mono text-[11px] uppercase tracking-[0.2em] text-neutral-500">
+          {winner?.driver?.acronym ?? "—"}
+          {showStartPosition && (
+            <> · from {formatPosition(winner?.startPosition ?? null)}</>
+          )}
+        </p>
+      </StatCard>
 
-      <div className="rounded-2xl border border-neutral-800 bg-neutral-900 p-5">
-        <p className="text-xs uppercase tracking-widest text-neutral-500">Fastest Lap</p>
-        <p className="mt-3 text-xl font-bold text-red-400">
+      {/* Fuchsia for fastest, matching the lap chart and pit log conventions */}
+      <StatCard label="Fastest Lap" accent="#c026d3">
+        <p className="mt-3 font-mono text-2xl font-black leading-none text-fuchsia-400 tabular-nums">
           {formatLapTime(fastestLap?.lap.lapDuration ?? null)}
         </p>
-        <p className="mt-1 text-sm text-neutral-500">
-          {fastestLap?.driver?.acronym ?? "—"} · Lap {fastestLap?.lap.lapNumber ?? "—"}
+        <p className="mt-2 font-mono text-[11px] uppercase tracking-[0.2em] text-neutral-500">
+          {fastestLap?.driver?.acronym ?? "—"} · Lap{" "}
+          {fastestLap?.lap.lapNumber ?? "—"}
         </p>
-      </div>
+      </StatCard>
 
       {showPitStop && (
-        <div className="rounded-2xl border border-neutral-800 bg-neutral-900 p-5">
-          <p className="text-xs uppercase tracking-widest text-neutral-500">Fastest Pit Stop</p>
-          <p className="mt-3 text-xl font-bold text-red-400">
+        <StatCard label="Fastest Pit Stop">
+          <p className="mt-3 font-mono text-2xl font-black leading-none tabular-nums">
             {formatPitDuration(fastestPitStop?.stop.pitDuration ?? null)}
           </p>
-          <p className="mt-1 text-sm text-neutral-500">
-            {fastestPitStop?.driver?.acronym ?? "—"} · Lap {fastestPitStop?.stop.lapNumber ?? "—"}
+          <p className="mt-2 font-mono text-[11px] uppercase tracking-[0.2em] text-neutral-500">
+            {fastestPitStop?.driver?.acronym ?? "—"} · Lap{" "}
+            {fastestPitStop?.stop.lapNumber ?? "—"}
           </p>
-        </div>
+        </StatCard>
       )}
 
-      <div className="rounded-2xl border border-neutral-800 bg-neutral-900 p-5">
-        <p className="mb-2 text-xs uppercase tracking-widest text-neutral-500">Fastest Sectors</p>
-        <div className="space-y-1 text-sm">
+      <StatCard label="Fastest Sectors">
+        <div className="mt-3 space-y-1.5">
           {(["s1", "s2", "s3"] as const).map((s, i) => (
-            <div key={s} className="flex items-center justify-between">
-              <span className="text-neutral-500">S{i + 1}</span>
-              <span className="font-semibold text-white">
+            <div
+              key={s}
+              className="flex items-baseline justify-between border-b border-neutral-900 pb-1 last:border-0"
+            >
+              <span className="font-mono text-[10px] uppercase tracking-[0.25em] text-neutral-600">
+                S{i + 1}
+              </span>
+              <span className="font-mono text-sm font-bold tabular-nums text-white">
                 {formatSectorTime(fastestSectors[s]?.value ?? null)}
-                <span className="ml-1 text-neutral-500">
+                <span className="ml-2 text-[10px] font-normal tracking-widest text-neutral-500">
                   {fastestSectors[s]?.driver?.acronym ?? ""}
                 </span>
               </span>
             </div>
           ))}
         </div>
-      </div>
+      </StatCard>
     </section>
   );
 }

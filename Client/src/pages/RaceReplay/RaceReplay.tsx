@@ -1,4 +1,4 @@
-import { useEffect, useState } from "react";
+import { useEffect, useMemo, useState } from "react";
 import { useNavigate } from "react-router-dom";
 import axios from "axios";
 import { getCountryIso, formatDateShort, resolveTrackShape } from "./F1utils";
@@ -6,7 +6,10 @@ import Navbar from "../../components/Navbar"
 import Footer from "../../components/Footer"
 
 const API_BASE = "http://localhost:5000";
-const SEASONS = ["2026", "2025", "2024", "2023"];
+// Matches what the database actually holds. 2023 was deliberately excluded
+// from the rebuild — its data was bad — so offering it would only ever return
+// an empty season.
+const SEASONS = ["2026", "2025", "2024"];
 
 interface Race {
   sessionKey: number;
@@ -45,57 +48,137 @@ function RaceReplay() {
     fetchRaces();
   }, [season]);
 
+  // A season in progress is the normal case, so the hero states how much of it
+  // has actually happened rather than implying the whole calendar is watchable.
+  const calendar = useMemo(() => {
+    const now = new Date();
+    const completed = races.filter((race) => new Date(race.date) <= now).length;
+
+    return {
+      total: races.length,
+      completed,
+      upcoming: races.length - completed,
+    };
+  }, [races]);
+
   return (
     <>
     <Navbar/>
-    <div className="min-h-screen bg-[#0A0A0A] pt-28">
-      <div className="mb-10 flex flex-wrap items-end justify-between gap-6 border-b border-neutral-800 pb-8">
-        <div>
-          <p className="mb-2 text-xs font-bold uppercase tracking-[0.35em] text-red-500">
-            Season Archive
-          </p>
+    <main className="min-h-screen bg-[#0A0A0A]">
+      {/* Hero — left-aligned instrument panel, matching Teams and the driver
+          dossier rather than the centred treatment used on marketing pages. */}
+      <section className="relative border-b border-neutral-900">
+        <span
+          aria-hidden
+          className="pointer-events-none absolute inset-0 opacity-[0.04]"
+          style={{
+            backgroundImage:
+              "repeating-linear-gradient(90deg, #fff 0 1px, transparent 1px 56px)",
+          }}
+        />
 
-          <h1 className="text-5xl font-black leading-none text-white sm:text-6xl">
-            RACE
-            <span className="text-red-500">.</span> REPLAY
+        <div className="relative mx-auto max-w-375 px-8 pb-10 pt-24">
+          {/* Top rail: what you are looking at, and the shape of it */}
+          <div className="flex flex-wrap items-end justify-between gap-6 border-b border-neutral-900 pb-6">
+            <p className="font-mono text-[11px] uppercase tracking-[0.4em] text-neutral-500">
+              {season}
+              <span className="mx-3 text-neutral-700">/</span>
+              Calendar
+            </p>
+
+            <div className="flex items-center gap-6 font-mono text-[11px] uppercase tracking-[0.2em] text-neutral-500">
+              <span>
+                <span className="mr-2 text-lg font-bold tabular-nums text-white">
+                  {calendar.total}
+                </span>
+                Rounds
+              </span>
+              <span className="h-4 w-px bg-neutral-800" />
+              <span>
+                <span className="mr-2 text-lg font-bold tabular-nums text-white">
+                  {calendar.completed}
+                </span>
+                Run
+              </span>
+              <span className="h-4 w-px bg-neutral-800" />
+              <span>
+                <span className="mr-2 text-lg font-bold tabular-nums text-white">
+                  {calendar.upcoming}
+                </span>
+                Upcoming
+              </span>
+            </div>
+          </div>
+
+          <h1 className="mt-10 text-7xl font-black uppercase leading-[0.85] tracking-tight text-white md:text-9xl">
+            RACE REPLAY
             <span className="text-red-500">.</span>
           </h1>
 
-          <p className="mt-3 max-w-md text-neutral-400">
-            Relive every Grand Prix.{" "}
-            <span className="text-neutral-200">Select a race to begin.</span>
+          <p className="mt-6 max-w-xl text-lg leading-8 text-neutral-400">
+            Every session of every weekend — race, qualifying and sprint —
+            rebuilt from timing data lap by lap.
           </p>
+
+          {/* Season selector, as pills to match the session selector on the
+              replay page itself rather than a native dropdown. */}
+          <div className="mt-9 flex flex-wrap gap-2">
+            {SEASONS.map((s) => {
+              const isActive = s === season;
+
+              return (
+                <button
+                  key={s}
+                  onClick={() => setSeason(s)}
+                  className={`rounded-xl border px-5 py-2 font-mono text-[11px] uppercase tracking-[0.2em] transition-colors duration-200 ${
+                    isActive
+                      ? "border-red-500 bg-red-500/10 text-white"
+                      : "border-neutral-800 text-neutral-500 hover:border-neutral-600 hover:text-white"
+                  }`}
+                >
+                  {s}
+                </button>
+              );
+            })}
+          </div>
+
+          {/* Calendar strip — one cell per round, filled once it has been run.
+              Gives the season's shape at a glance and jumps straight to a
+              weekend, which no amount of scrolling the grid does. */}
+          {calendar.total > 0 && (
+            <div className="mt-10">
+              <div className="flex flex-wrap gap-1">
+                {races.map((race, index) => {
+                  const isRun = new Date(race.date) <= new Date();
+
+                  return (
+                    <button
+                      key={race.sessionKey}
+                      onClick={() =>
+                        navigate(`/race/${race.sessionKey}`, {
+                          state: { ...race, round: race.round ?? index + 1 },
+                        })
+                      }
+                      title={`Round ${race.round ?? index + 1} — ${race.raceName} · ${formatDateShort(race.date)}${isRun ? "" : " (upcoming)"}`}
+                      className={`h-7 w-3 rounded-[2px] transition-all duration-200 hover:scale-y-125 ${
+                        isRun
+                          ? "bg-red-500/70 hover:bg-red-500"
+                          : "border border-neutral-800 bg-neutral-900 hover:border-neutral-600"
+                      }`}
+                    />
+                  );
+                })}
+              </div>
+
+              <p className="mt-3 font-mono text-[10px] uppercase tracking-[0.25em] text-neutral-600">
+                {calendar.completed} of {calendar.total} run · select a round
+              </p>
+            </div>
+          )}
         </div>
+      </section>
 
-        <div className="relative">
-          <select
-            value={season}
-            onChange={(e) => setSeason(e.target.value)}
-            className="appearance-none rounded-xl border border-neutral-700 bg-neutral-900 py-3 pl-4 pr-10 text-sm font-semibold text-white transition-colors duration-200 hover:border-red-500 focus:border-red-500 focus:outline-none"
-          >
-            {SEASONS.map((s) => (
-              <option key={s} value={s}>
-                {s} Season
-              </option>
-            ))}
-          </select>
-
-          <svg
-            viewBox="0 0 24 24"
-            fill="none"
-            className="pointer-events-none absolute right-3 top-1/2 h-4 w-4 -translate-y-1/2 text-neutral-500"
-          >
-            <path
-              d="M6 9l6 6 6-6"
-              stroke="currentColor"
-              strokeWidth="2"
-              strokeLinecap="round"
-              strokeLinejoin="round"
-            />
-          </svg>
-        </div>
-      </div>
-
+      <div className="mx-auto max-w-375 px-8 pb-24 pt-12">
       {loading && (
         <div className="grid grid-cols-1 gap-4 sm:grid-cols-2 lg:grid-cols-3">
           {Array.from({ length: 6 }).map((_, i) => (
@@ -197,7 +280,8 @@ function RaceReplay() {
           })}
         </div>
       )}
-    </div>
+      </div>
+    </main>
     <Footer/>
     </>
   );

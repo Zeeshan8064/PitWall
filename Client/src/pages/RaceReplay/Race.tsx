@@ -12,7 +12,12 @@ import {
   PitStopLog,
   ClassificationTable,
 } from "./Racecomponents";
-import { getCountryIso, formatDateFull, resolveTrackShape } from "./F1utils";
+import {
+  getCountryIso,
+  formatDateFull,
+  formatGap,
+  resolveTrackShape,
+} from "./F1utils";
 
 // Session types that are raced rather than run against the clock. Everything
 // downstream keys off this rather than off the weekend, so adding a session
@@ -75,6 +80,15 @@ export default function Race() {
     meta.circuit ?? sessionKey ?? "default"
   );
 
+  const podium = classification.slice(0, 3);
+
+  // The hero takes the winning team's colour, so Monza in red reads
+  // differently from Hungary in papaya. Falls back to the app red before the
+  // classification lands.
+  const heroColour = podium[0]?.driver?.teamColour
+    ? `#${podium[0].driver.teamColour}`
+    : "#e00400";
+
   // The URL is the single source of truth for which session is shown, so
   // switching is a navigation. Replacing rather than pushing keeps Back
   // pointing at the race list instead of walking the sessions in reverse.
@@ -91,7 +105,7 @@ export default function Race() {
     <>
       <Navbar/>
 
-      <main className="min-h-screen bg-[#0A0A0A] px-8 pb-16 pt-28 text-white">
+      <main className="min-h-screen bg-[#0A0A0A] px-8 pb-16 pt-24 text-white">
         <button
           onClick={() => navigate("/race-replay")}
           className="mb-6 flex items-center gap-1 text-sm text-neutral-400 transition-colors hover:text-white"
@@ -102,61 +116,176 @@ export default function Race() {
           Back to Race Replay
         </button>
 
-        {/* Hero */}
-        <section className="relative overflow-hidden border-b border-neutral-800 pb-10">
+        {/* Hero — carries the result, not just the metadata. The circuit is the
+            backdrop, the winning team's colour lights it, and the podium says
+            what actually happened. */}
+        <section className="relative overflow-hidden border-b border-neutral-900">
+          {/* Blueprint grid — the technical-drawing ground the circuit sits on */}
+          <span
+            aria-hidden
+            className="pointer-events-none absolute inset-0 opacity-[0.055]"
+            style={{
+              backgroundImage:
+                "repeating-linear-gradient(90deg, #fff 0 1px, transparent 1px 52px)," +
+                "repeating-linear-gradient(0deg, #fff 0 1px, transparent 1px 52px)",
+            }}
+          />
+
+          {/* Winner's team colour, so no two races look alike */}
+          <div
+            aria-hidden
+            className="pointer-events-none absolute right-[8%] top-1/2 h-[34rem] w-[34rem] -translate-y-1/2 rounded-full opacity-20 blur-[150px]"
+            style={{ background: heroColour }}
+          />
+
+          {/* The circuit, drawing itself once on load — the same single lap of
+              telemetry the outline was traced from. Keyed on the session so it
+              re-runs when you switch weekends. */}
           <svg
+            key={sessionKey}
             viewBox={trackShape.viewBox}
             preserveAspectRatio="xMidYMid meet"
-            className="pointer-events-none absolute -right-6 -top-6 h-64 w-96 text-neutral-800 opacity-60"
+            aria-hidden
+            className="pointer-events-none absolute -right-10 top-1/2 hidden h-[150%] w-[42rem] -translate-y-1/2 lg:block"
             fill="none"
+            style={{ color: heroColour }}
           >
+            {/* Ghost of the full lap, so the shape is legible before and
+                during the draw */}
             <path
               d={trackShape.path}
               stroke="currentColor"
-              // Traced outlines carry far more detail than the doodles, so a
-              // thinner stroke keeps the corners from filling in.
-              strokeWidth={trackShape.isReal ? 1.4 : 2}
+              strokeWidth={trackShape.isReal ? 1.1 : 1.6}
               strokeLinecap="round"
               strokeLinejoin="round"
+              opacity={0.12}
+            />
+            <path
+              className="animate-trace"
+              pathLength={1}
+              d={trackShape.path}
+              stroke="currentColor"
+              strokeWidth={trackShape.isReal ? 1.6 : 2.2}
+              strokeLinecap="round"
+              strokeLinejoin="round"
+              opacity={0.55}
+              style={{ filter: `drop-shadow(0 0 14px ${heroColour})` }}
             />
           </svg>
 
-          <div className="relative z-10 flex items-center gap-3">
-            {iso ? (
-              <img src={`https://flagcdn.com/48x36/${iso}.png`} width={36} height={27} alt={meta.country ?? ""} className="rounded-[3px] shadow-sm" />
-            ) : (
-              <span className="flex h-6.75 w-9 items-center justify-center rounded-[3px] bg-neutral-800 text-xs text-neutral-500">?</span>
+          {/* Sinks the right edge so the circuit fades out rather than being
+              cut off by the section boundary */}
+          <span
+            aria-hidden
+            className="pointer-events-none absolute inset-y-0 right-0 hidden w-40 lg:block"
+            style={{
+              background:
+                "linear-gradient(90deg, transparent 0%, #0A0A0A 85%)",
+            }}
+          />
+
+          <div className="relative flex flex-wrap items-start justify-between gap-8">
+            <div className="min-w-0 flex-1">
+              {/* Top rail */}
+              <div className="flex flex-wrap items-center gap-x-4 gap-y-2 border-b border-neutral-900 pb-5 font-mono text-[11px] uppercase tracking-[0.35em] text-neutral-500">
+                <span className="text-red-500">
+                  {meta.round ? `Round ${meta.round}` : "Session"}
+                </span>
+                <span className="h-3 w-px bg-neutral-800" />
+                <span>{meta.date ? formatDateFull(meta.date) : "—"}</span>
+
+                {iso && (
+                  <>
+                    <span className="h-3 w-px bg-neutral-800" />
+                    <span className="flex items-center gap-2">
+                      <img
+                        src={`https://flagcdn.com/24x18/${iso}.png`}
+                        width={20}
+                        height={15}
+                        alt=""
+                        className="rounded-[2px]"
+                      />
+                      {meta.country}
+                    </span>
+                  </>
+                )}
+              </div>
+
+              <h1 className="mt-8 text-5xl font-black uppercase leading-[0.9] tracking-tight sm:text-7xl">
+                {meta.raceName ?? `Session ${sessionKey}`}
+                <span className="text-red-500">.</span>
+              </h1>
+
+              <p className="mt-4 font-mono text-[11px] uppercase tracking-[0.3em] text-neutral-500">
+                {meta.circuit ?? "Circuit"}
+                {meeting?.location && ` · ${meeting.location}`}
+              </p>
+
+              {/* Meeting -> available sessions -> selected session */}
+              {context && (
+                <SessionSelector
+                  context={context}
+                  selectedKey={Number(sessionKey)}
+                  onSelect={selectSession}
+                />
+              )}
+            </div>
+
+            {/* Result. Only once the session has actually been classified —
+                a future or still-loading session gets nothing rather than a
+                row of dashes. */}
+            {!isFutureSession && podium.length > 0 && (
+              <div className="w-full shrink-0 pt-4 lg:w-80">
+                <p className="font-mono text-[10px] uppercase tracking-[0.3em] text-neutral-500">
+                  {isRacedSession ? "Podium" : "Top Three"}
+                </p>
+
+                <div className="mt-4 space-y-2">
+                  {podium.map((row, index) => {
+                    const colour = row.driver?.teamColour
+                      ? `#${row.driver.teamColour}`
+                      : "#525252";
+
+                    return (
+                      <div
+                        key={row.driverNumber}
+                        className="flex items-center gap-3 rounded-xl border border-neutral-800 bg-neutral-950/70 p-3 backdrop-blur-sm"
+                      >
+                        <span
+                          className="font-mono text-lg font-black tabular-nums"
+                          style={{ color: colour }}
+                        >
+                          {index + 1}
+                        </span>
+
+                        <span
+                          className="h-8 w-[3px] shrink-0 rounded-full"
+                          style={{ backgroundColor: colour }}
+                        />
+
+                        <span className="min-w-0 flex-1">
+                          <span className="block truncate text-sm font-bold uppercase text-white">
+                            {row.driver?.lastName ?? `#${row.driverNumber}`}
+                          </span>
+                          <span className="block font-mono text-[10px] uppercase tracking-[0.2em] text-neutral-500">
+                            {row.driver?.team ?? "—"}
+                          </span>
+                        </span>
+
+                        {index > 0 && (
+                          <span className="shrink-0 font-mono text-[11px] tabular-nums text-neutral-400">
+                            {formatGap(row.gapToLeader)}
+                          </span>
+                        )}
+                      </div>
+                    );
+                  })}
+                </div>
+              </div>
             )}
-            <p className="text-xs font-bold uppercase tracking-[0.35em] text-red-500">
-              {meta.round ? `Round ${meta.round}` : "Race"}
-              {meta.date && <span className="ml-2 font-medium text-neutral-500">{formatDateFull(meta.date)}</span>}
-            </p>
           </div>
 
-          <h1 className="relative z-10 mt-2 text-5xl font-black uppercase leading-none sm:text-6xl">
-            {meta.raceName ?? `Session ${sessionKey}`}
-            <span className="text-red-500">.</span>
-          </h1>
-
-          <p className="relative z-10 mt-4 text-lg text-neutral-400">
-            {selected && (
-              <span className="font-semibold text-neutral-200">{selected.label}</span>
-            )}
-            {selected && " · "}
-            {meta.circuit ?? "Circuit"}
-            {meta.country && <>, {meta.country}</>}
-          </p>
-
-          {/* Meeting -> available sessions -> selected session */}
-          {context && (
-            <div className="relative z-10">
-              <SessionSelector
-                context={context}
-                selectedKey={Number(sessionKey)}
-                onSelect={selectSession}
-              />
-            </div>
-          )}
+          <div className="pb-8" />
         </section>
 
         {contextError && <div className="mt-10 text-red-400">{contextError}</div>}

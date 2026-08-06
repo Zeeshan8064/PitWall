@@ -47,6 +47,10 @@ export interface SessionContext {
 
 export interface Driver {
   driverNumber: number;
+  // Returned by /drivers alongside fullName; surname alone reads better on a
+  // stat card than a full name that wraps.
+  firstName: string;
+  lastName: string;
   fullName: string;
   acronym: string;
   team: string;

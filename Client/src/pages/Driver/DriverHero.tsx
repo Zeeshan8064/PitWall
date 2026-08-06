@@ -83,7 +83,7 @@ export default function DriverHero({
   };
 
   return (
-    <section className="relative min-h-[500px] overflow-hidden">
+    <section className="relative min-h-[610px] overflow-hidden">
       {/* Stage: team-colour spotlight behind the subject, vignette at the
           edges, and the hairline grid used across the app's cards. */}
       <div
@@ -134,13 +134,13 @@ export default function DriverHero({
           }
         }}
         alt={driver.fullName}
-        className="pointer-events-none absolute bottom-0 left-[68%] z-10 h-[78%] w-auto object-contain object-bottom drop-shadow-[0_25px_60px_rgba(0,0,0,0.85)]"
+        className="pointer-events-none absolute bottom-0 left-[68%] z-10 h-[84%] w-auto object-contain object-bottom drop-shadow-[0_25px_60px_rgba(0,0,0,0.85)]"
       />
 
       {/* Dossier */}
       {/* Top padding clears the fixed navbar (top-5 + h-16 ≈ 84px) while the
           hero's own background still runs full-bleed behind it. */}
-      <div className="relative z-30 max-w-2xl px-6 pb-10 pt-24 sm:px-10">
+      <div className="relative z-30 max-w-2xl px-6 pb-12 pt-24 sm:px-10">
         <Link
           to="/drivers"
           className="mb-5 flex w-fit items-center gap-1 text-sm text-neutral-400 transition-colors hover:text-white"
@@ -182,7 +182,17 @@ export default function DriverHero({
         <p className="mt-5 text-3xl font-light leading-none text-neutral-300 sm:text-4xl">
           {driver.firstName}
         </p>
-        <h1 className="mt-1 text-6xl font-black uppercase leading-[0.85] tracking-tight text-white sm:text-8xl">
+        {/* Surnames are a single word, so they cannot wrap — at a fixed size a
+            long one overflows this column and collides with the number behind
+            it. Sizing against length keeps every name inside the dossier. */}
+        <h1
+          className="mt-1 font-black uppercase leading-[0.85] tracking-tight text-white"
+          style={{
+            fontSize: `min(6rem, ${Math.round(
+              620 / Math.max(driver.lastName.length, 5)
+            )}px, 12vw)`,
+          }}
+        >
           {driver.lastName}
         </h1>
 

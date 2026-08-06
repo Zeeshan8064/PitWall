@@ -33,13 +33,35 @@ router.get("/drivers/:driverNumber", async (req, res) => {
       });
     }
 
-    const { season, stats, championship, timeline } =
-      await getDriverSeasonStats(driverNumber);
+    // ?season=2025 for one season, ?season=career for every ingested season.
+    // Omitted defaults to the current season.
+    const requested = req.query.season;
+
+    let year: number | null | undefined = undefined;
+
+    if (requested === "career") {
+      year = null;
+    } else if (requested !== undefined) {
+      year = Number(requested);
+
+      if (isNaN(year)) {
+        return res.status(400).json({
+          success: false,
+          message: "Invalid season — expected a year or 'career'",
+        });
+      }
+    }
+
+    const { season, availableSeasons, stats, championship, timeline } =
+      year === undefined
+        ? await getDriverSeasonStats(driverNumber)
+        : await getDriverSeasonStats(driverNumber, year);
 
     res.json({
       success: true,
       driverNumber,
       season,
+      availableSeasons,
       stats,
       championship,
       timeline,

@@ -1,8 +1,8 @@
 import { useEffect, useState } from "react";
 import { useParams } from "react-router-dom";
 import DriverStats from "./DriverStats";
+import type { SeasonStats, TimelineRow } from "./DriverStats";
 import DriverHero from "./DriverHero";
-import type { TimelineEntry } from "./DriverHero";
 import Navbar from "../../components/Navbar";
 import Footer from "../../components/Footer";
 
@@ -20,15 +20,10 @@ interface Driver {
 
 interface DriverSeason {
   season: number | null;
-  stats: {
-    wins: number;
-    podiums: number;
-    poles: number;
-    starts: number;
-    averageFinish: number;
-  } | null;
+  stats: SeasonStats | null;
   championship: { position: number | null; points: number } | null;
-  timeline: TimelineEntry[];
+  timeline: TimelineRow[];
+  availableSeasons: number[];
 }
 
 // Mirrors the server's toSlug so team artwork resolves from a team name.
@@ -76,6 +71,7 @@ export default function DriverProfile() {
             stats: data.stats ?? null,
             championship: data.championship ?? null,
             timeline: data.timeline ?? [],
+            availableSeasons: data.availableSeasons ?? [],
           });
         }
       } catch (err) {
@@ -132,6 +128,9 @@ export default function DriverProfile() {
           driverNumber={driver.driverNumber}
           teamColour={driver.teamColour}
           stats={season?.stats ?? null}
+          timeline={season?.timeline ?? []}
+          availableSeasons={season?.availableSeasons ?? []}
+          initialSeason={season?.season ?? null}
         />
       </main>
 

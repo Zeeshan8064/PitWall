@@ -24,3 +24,29 @@ body {
 .animate-marquee:hover {
   animation-play-state: paused;
 }
+/* Circuit outlines are traced from position telemetry, so the hero draws them
+   the way they were captured — one continuous lap. pathLength="1" normalises
+   every circuit to the same length, so a short track and a long one take the
+   same time to draw. */
+@keyframes trace-circuit {
+  from {
+    stroke-dashoffset: 1;
+  }
+
+  to {
+    stroke-dashoffset: 0;
+  }
+}
+
+.animate-trace {
+  stroke-dasharray: 1;
+  stroke-dashoffset: 1;
+  animation: trace-circuit 2.8s ease-in-out forwards;
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .animate-trace {
+    animation: none;
+    stroke-dashoffset: 0;
+  }
+}
