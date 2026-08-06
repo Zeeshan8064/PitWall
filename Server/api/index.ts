@@ -1,6 +1,6 @@
 import type { IncomingMessage, ServerResponse } from "http";
 
-import { createApp } from "../src/app";
+import { createApp } from "../src/createApp";
 import { connectToDatabase } from "../src/lib/db";
 
 // Serverless entry point. Vercel routes every request here (see vercel.json)

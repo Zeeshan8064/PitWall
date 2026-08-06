@@ -1,6 +1,6 @@
 import dotenv from "dotenv";
 
-import { allowedOriginsSummary, createApp } from "./app";
+import { allowedOriginsSummary, createApp } from "./createApp";
 import { connectToDatabase } from "./lib/db";
 
 dotenv.config();
