@@ -40,6 +40,25 @@ export function createApp() {
 
   app.use("/api/races", routes);
 
+  // The API root. Explicit rather than falling through to the catch-all:
+  // behind Vercel's rewrite the bare "/" resolves differently from every
+  // other path and returned an opaque 500, and an API root that describes
+  // itself is more useful than a 404 in any case.
+  app.get("/", (_req, res) => {
+    res.json({
+      name: "PitWall API",
+      health: "/health",
+      endpoints: [
+        "/api/races/season/:year",
+        "/api/races/drivers",
+        "/api/races/teams",
+        "/api/races/championship/drivers/:year",
+        "/api/races/:sessionKey/race-data",
+        "/api/races/:sessionKey/strategy",
+      ],
+    });
+  });
+
   app.get("/health", (_req, res) => {
     res.json({
       ok: mongoose.connection.readyState === 1,
