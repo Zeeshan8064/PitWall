@@ -38,6 +38,22 @@ if (process.env.NODE_ENV === "production" && allowedOrigins.length === 0) {
 app.use(cors({ origin: allowedOrigins.length > 0 ? allowedOrigins : true }));
 app.use(express.json({ limit: "100kb" }));
 
+// Never cache API responses.
+//
+// The default on Vercel is `public, max-age=0, must-revalidate`, which lets a
+// browser keep a copy and revalidate. Because the CORS header varies by
+// origin, a response fetched while an origin was NOT allowed gets stored
+// without Access-Control-Allow-Origin, and revalidation happily reuses that
+// body — so the request keeps failing with "CORS header missing" long after
+// the allowlist was fixed, and only a hard reload clears it.
+//
+// The data behind this API changes only when an ingest runs, but correctness
+// beats a cache hit on responses whose headers are origin-dependent.
+app.use((_req, res, next) => {
+  res.setHeader("Cache-Control", "no-store");
+  next();
+});
+
 // Connect before anything touches the database. Cached, so this is a no-op
 // after the first request — but it has to be middleware rather than a one-off
 // at startup, because a serverless container can serve its first request

@@ -110,7 +110,7 @@ function RaceReplay() {
             </div>
           </div>
 
-          <h1 className="mt-10 text-7xl font-black uppercase leading-[0.85] tracking-tight text-white md:text-9xl">
+          <h1 className="mt-10 font-black uppercase leading-[0.85] tracking-tight text-white" style={{ fontSize: "clamp(2.75rem, 9vw, 8rem)" }}>
             RACE REPLAY
             <span className="text-red-500">.</span>
           </h1>

@@ -124,7 +124,7 @@ export default function Drivers() {
               </div>
             </div>
 
-            <h1 className="mt-10 text-7xl font-black uppercase leading-[0.85] tracking-tight md:text-9xl">
+            <h1 className="mt-10 font-black uppercase leading-[0.85] tracking-tight" style={{ fontSize: "clamp(2.75rem, 9vw, 8rem)" }}>
               THE FIELD
               <span className="text-red-500">.</span>
             </h1>
