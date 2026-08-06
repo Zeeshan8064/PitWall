@@ -5,6 +5,7 @@
     "dev": "nodemon -e ts,json --exec ts-node src/index.ts",
     "ingest": "ts-node src/scripts/ingestSeason.ts",
     "outlines": "ts-node src/scripts/backfillOutlines.ts",
+    "seed:teams": "ts-node src/scripts/seedTeams.ts",
     "rebuild": "ts-node src/scripts/rebuild.ts",
     "verify": "ts-node src/scripts/verify.ts",
     "build": "tsc",

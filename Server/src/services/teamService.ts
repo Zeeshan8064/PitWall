@@ -67,6 +67,27 @@ function serialiseTeam(team: any) {
   };
 }
 
+// Everything written by scripts/seedTeams.ts. Null throughout for a team that
+// has not been seeded, which the client renders as an absent section rather
+// than a block of dashes.
+function serialiseTeamInfo(team: any) {
+  if (!team.seededAt) return null;
+
+  return {
+    fullName: team.fullName ?? null,
+    base: team.base ?? null,
+    entered: team.entered ?? null,
+    enteredAs: team.enteredAs ?? null,
+    owner: team.owner ?? null,
+    principal: team.principal ?? null,
+    powerUnit: team.powerUnit ?? null,
+    titleSponsor: team.titleSponsor ?? null,
+    constructorsTitles: team.constructorsTitles ?? null,
+    lineage: team.lineage ?? [],
+    blurb: team.blurb ?? null,
+  };
+}
+
 // A constructor's season: who drove, where they stand, and what the two cars
 // scored between them. RaceResult refs drivers rather than teams, so the seats
 // are resolved first and the results aggregated across them.
@@ -162,6 +183,7 @@ export async function getTeamDetail(slug: string, season: number) {
 
   return {
     team: serialiseTeam(team),
+    info: serialiseTeamInfo(team),
     season,
     drivers: entries
       .filter((entry) => entry.driver)

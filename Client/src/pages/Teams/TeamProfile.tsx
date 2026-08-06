@@ -4,10 +4,23 @@ import axios from "axios";
 import Navbar from "../../components/Navbar";
 import Footer from "../../components/Footer";
 import SeasonChart from "./SeasonChart";
-import { getTeamInfo } from "./teamInfo";
 
 const API_BASE = "http://localhost:5000";
 const SEASON = 2026;
+
+interface TeamInfo {
+  fullName: string | null;
+  base: string | null;
+  entered: number | null;
+  enteredAs: string | null;
+  owner: string | null;
+  principal: string | null;
+  powerUnit: string | null;
+  titleSponsor: string | null;
+  constructorsTitles: number | null;
+  lineage: string[];
+  blurb: string | null;
+}
 
 interface TeamDetail {
   team: {
@@ -17,6 +30,8 @@ interface TeamDetail {
     country: string | null;
     color: string;
   };
+  // Hand-seeded background; null when a team has not been seeded.
+  info: TeamInfo | null;
   season: number;
   drivers: {
     driverNumber: number;
@@ -115,7 +130,8 @@ export default function TeamProfile() {
   }, [slug]);
 
   const color = withHash(detail?.team.color ?? "");
-  const info = detail ? getTeamInfo(detail.team.slug) : null;
+  // Seeded server-side by scripts/seedTeams.ts; null for an unseeded team.
+  const info = detail?.info ?? null;
 
   // Only rounds the team actually has standings for — a season part-run
   // should not render across rounds that have not happened. Scaling now lives
@@ -374,20 +390,27 @@ export default function TeamProfile() {
                       {[
                         {
                           label: "Entered F1",
-                          value: info.enteredAs
-                            ? `${info.entered} · as ${info.enteredAs}`
-                            : String(info.entered),
+                          // Every field is nullable now that it comes from a
+                          // seed that may not cover a given team.
+                          value: info.entered
+                            ? info.enteredAs
+                              ? `${info.entered} · as ${info.enteredAs}`
+                              : String(info.entered)
+                            : "—",
                         },
-                        { label: "Base", value: info.base },
-                        { label: "Owner", value: info.owner },
-                        { label: "Team Principal", value: info.principal },
-                        { label: "Power Unit", value: info.powerUnit },
+                        { label: "Base", value: info.base ?? "—" },
+                        { label: "Owner", value: info.owner ?? "—" },
+                        { label: "Team Principal", value: info.principal ?? "—" },
+                        { label: "Power Unit", value: info.powerUnit ?? "—" },
                         ...(info.titleSponsor
                           ? [{ label: "Title Sponsor", value: info.titleSponsor }]
                           : []),
                         {
                           label: "Constructors' Titles",
-                          value: String(info.constructorsTitles),
+                          value:
+                            info.constructorsTitles !== null
+                              ? String(info.constructorsTitles)
+                              : "—",
                         },
                       ].map((row) => (
                         <div
