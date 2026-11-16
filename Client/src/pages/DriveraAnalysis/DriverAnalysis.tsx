@@ -191,6 +191,38 @@ export default function DriverAnalysis() {
     return { min: min - pad, max: max + pad };
   }, [delta]);
 
+  // What the line actually says, in words. The sign convention is easy to read
+  // backwards, so the page states the answer instead of making you derive it.
+  const deltaSummary = useMemo(() => {
+    if (delta.length === 0) return null;
+
+    const final = delta[delta.length - 1].delta;
+    const leader = final < 0 ? leftDriver : rightDriver;
+
+    return {
+      laps: delta.length,
+      gap: Math.abs(final),
+      acronym: leader?.acronym ?? "",
+      leaderIsLeft: final < 0,
+      level: Math.abs(final) < 0.5,
+    };
+  }, [delta, leftDriver, rightDriver]);
+
+  // The series skips pit-out laps, so a stop shows up as a step with nothing to
+  // explain it. Mark the laps either car rejoined on.
+  const pitLaps = useMemo(() => {
+    const out = new Set<number>();
+
+    for (const lap of laps) {
+      if (!lap.isPitOutLap) continue;
+      if (lap.driverNumber === left || lap.driverNumber === right) {
+        out.add(lap.lapNumber);
+      }
+    }
+
+    return out;
+  }, [laps, left, right]);
+
   const leftColour = withHash(leftDriver?.teamColour, "#e00400");
   const rightColour = withHash(rightDriver?.teamColour, "#3b82f6");
 
@@ -345,10 +377,30 @@ export default function DriverAnalysis() {
                   <h2 className="font-mono text-[11px] uppercase tracking-[0.35em] text-neutral-500">
                     Cumulative Gap
                   </h2>
-                  <p className="font-mono text-[10px] uppercase tracking-[0.2em] text-neutral-600">
-                    Above the line · {rightDriver?.acronym} ahead
-                  </p>
                 </div>
+
+                {deltaSummary && (
+                  <p className="mt-4 text-xl text-neutral-200">
+                    {deltaSummary.level ? (
+                      <>Level after {deltaSummary.laps} shared laps.</>
+                    ) : (
+                      <>
+                        <span
+                          className="font-semibold"
+                          style={{
+                            color: deltaSummary.leaderIsLeft
+                              ? leftColour
+                              : rightColour,
+                          }}
+                        >
+                          {deltaSummary.acronym}
+                        </span>{" "}
+                        gained {deltaSummary.gap.toFixed(1)}s across{" "}
+                        {deltaSummary.laps} shared laps.
+                      </>
+                    )}
+                  </p>
+                )}
 
                 {delta.length > 1 ? (
                   <svg viewBox="0 0 800 240" className="mt-5 w-full">
@@ -394,6 +446,32 @@ export default function DriverAnalysis() {
                             </g>
                           ))}
 
+                          {delta.map((d, i) => {
+                            if (i === 0) return null;
+
+                            const previous = delta[i - 1].lap;
+                            let pitted = false;
+
+                            for (let l = previous + 1; l <= d.lap; l++) {
+                              if (pitLaps.has(l)) pitted = true;
+                            }
+
+                            if (!pitted) return null;
+
+                            return (
+                              <line
+                                key={`pit-${d.lap}`}
+                                x1={x(i)}
+                                x2={x(i)}
+                                y1={20}
+                                y2={210}
+                                stroke="#404040"
+                                strokeWidth={1}
+                                strokeDasharray="2 3"
+                              />
+                            );
+                          })}
+
                           <path
                             d={`${line} L ${x(delta.length - 1)} ${zeroY} L ${x(0)} ${zeroY} Z`}
                             fill={leftColour}
@@ -406,6 +484,27 @@ export default function DriverAnalysis() {
                             strokeWidth={2}
                             strokeLinejoin="round"
                           />
+
+                          <text
+                            x={786}
+                            y={32}
+                            textAnchor="end"
+                            fontSize={9}
+                            fill="#525252"
+                            fontFamily="ui-monospace, monospace"
+                          >
+                            ↑ {rightDriver?.acronym} ahead
+                          </text>
+                          <text
+                            x={786}
+                            y={206}
+                            textAnchor="end"
+                            fontSize={9}
+                            fill="#525252"
+                            fontFamily="ui-monospace, monospace"
+                          >
+                            ↓ {leftDriver?.acronym} ahead
+                          </text>
 
                           <text
                             x={50}
@@ -437,10 +536,12 @@ export default function DriverAnalysis() {
                 )}
 
                 <p className="mt-3 border-t border-neutral-900 pt-3 text-[10px] leading-relaxed text-neutral-600">
-                  Running total of {leftDriver?.acronym} minus{" "}
-                  {rightDriver?.acronym} on every lap both completed without
-                  pitting. A rising line means {leftDriver?.acronym} is losing
-                  time; a step usually marks a stop on a different lap.
+                  The line is the gap between the two, lap by lap — not either
+                  driver's pace on its own. It starts at zero and moves down
+                  whenever {leftDriver?.acronym} is the quicker of the two on
+                  that lap, up whenever {rightDriver?.acronym} is. Only laps
+                  both completed without pitting are counted, so the total is
+                  pace alone; dotted lines mark where a stop interrupted it.
                 </p>
               </div>
 
