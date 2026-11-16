@@ -1,6 +1,7 @@
 import { useState } from "react";
 import { Link } from "react-router-dom";
 import { getCountryIso } from "../RaceReplay/F1utils";
+import { withHash } from "../../lib/colour";
 
 export interface HeroDriver {
   driverNumber: number;
@@ -53,9 +54,7 @@ export default function DriverHero({
 }: Props) {
   const [logoFailed, setLogoFailed] = useState(false);
 
-  const color = driver.teamColour?.startsWith("#")
-    ? driver.teamColour
-    : `#${driver.teamColour}`;
+  const color = withHash(driver.teamColour);
 
   const iso = getCountryIso(driver.countryCode);
 

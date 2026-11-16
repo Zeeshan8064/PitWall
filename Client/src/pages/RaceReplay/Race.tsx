@@ -18,6 +18,7 @@ import {
   formatGap,
   resolveTrackShape,
 } from "./F1utils";
+import { withHash } from "../../lib/colour";
 
 // Session types that are raced rather than run against the clock. Everything
 // downstream keys off this rather than off the weekend, so adding a session
@@ -85,9 +86,7 @@ export default function Race() {
   // The hero takes the winning team's colour, so Monza in red reads
   // differently from Hungary in papaya. Falls back to the app red before the
   // classification lands.
-  const heroColour = podium[0]?.driver?.teamColour
-    ? `#${podium[0].driver.teamColour}`
-    : "#e00400";
+  const heroColour = withHash(podium[0]?.driver?.teamColour, "#e00400");
 
   // The URL is the single source of truth for which session is shown, so
   // switching is a navigation. Replacing rather than pushing keeps Back
@@ -242,9 +241,7 @@ export default function Race() {
 
                 <div className="mt-4 space-y-2">
                   {podium.map((row, index) => {
-                    const colour = row.driver?.teamColour
-                      ? `#${row.driver.teamColour}`
-                      : "#525252";
+                    const colour = withHash(row.driver?.teamColour, "#525252");
 
                     return (
                       <div

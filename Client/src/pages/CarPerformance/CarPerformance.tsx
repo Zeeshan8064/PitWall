@@ -5,6 +5,7 @@ import Footer from "../../components/Footer";
 import { formatSectorTime } from "../RaceReplay/F1utils";
 import type { Driver, Lap } from "../RaceReplay/raceTypes";
 import { API_BASE } from "../../lib/api";
+import { withHash } from "../../lib/colour";
 
 const SEASONS = [2026, 2025, 2024];
 
@@ -120,7 +121,7 @@ export default function CarPerformance() {
 
       rows.push({
         team,
-        colour: colour.startsWith("#") ? colour : `#${colour}`,
+        colour: withHash(colour),
         sectors: [best("sector1"), best("sector2"), best("sector3")],
         topSpeed: speeds.length ? Math.max(...speeds) : null,
         bestLap: lapTimes.length ? Math.min(...lapTimes) : null,

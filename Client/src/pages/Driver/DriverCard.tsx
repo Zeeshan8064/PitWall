@@ -1,5 +1,6 @@
 import { Link } from "react-router-dom";
 import { getCountryIso } from "../RaceReplay/F1utils";
+import { withHash } from "../../lib/colour";
 
 interface DriverCardProps {
   driver: {
@@ -14,11 +15,6 @@ interface DriverCardProps {
   };
 }
 
-function withHash(colour: string) {
-  if (!colour) return "#666666";
-
-  return colour.startsWith("#") ? colour : `#${colour}`;
-}
 
 export default function DriverCard({ driver }: DriverCardProps) {
   const colour = withHash(driver.teamColour);

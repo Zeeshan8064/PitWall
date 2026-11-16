@@ -5,6 +5,7 @@ import Footer from "../../components/Footer";
 import { formatLapTime, formatSectorTime } from "../RaceReplay/F1utils";
 import type { Driver, Lap } from "../RaceReplay/raceTypes";
 import { API_BASE } from "../../lib/api";
+import { withHash } from "../../lib/colour";
 
 const SEASONS = [2026, 2025, 2024];
 
@@ -189,15 +190,6 @@ export default function DriverAnalysis() {
 
     return { min: min - pad, max: max + pad };
   }, [delta]);
-
-  // The API already hands back colours with a leading "#", so blindly prefixing
-  // another one produced "##3671c6" — an invalid value that SVG silently drops,
-  // leaving the gap line unpainted.
-  const withHash = (colour: string | undefined, fallback: string) => {
-    if (!colour) return fallback;
-
-    return colour.startsWith("#") ? colour : `#${colour}`;
-  };
 
   const leftColour = withHash(leftDriver?.teamColour, "#e00400");
   const rightColour = withHash(rightDriver?.teamColour, "#3b82f6");

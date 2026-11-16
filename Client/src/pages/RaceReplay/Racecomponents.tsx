@@ -8,6 +8,7 @@ import {
   formatGap,
   COMPOUND_STYLES,
 } from "./F1utils"
+import { withHash } from "../../lib/colour";
 
 // ─── Stat Cards ────────────────────────────────────────────────────────────
 
@@ -61,7 +62,7 @@ export function RaceStats({
   showPitStop = true,
 }: RaceStatsProps) {
   const winnerColour = winner?.driver?.teamColour
-    ? `#${winner.driver.teamColour}`
+    ? withHash(winner.driver.teamColour)
     : undefined;
 
   return (
@@ -148,7 +149,7 @@ export function LapTimeChartSection({
   const points = activeDriverNumber !== null ? buildLapSeries(activeDriverNumber) : [];
 
   const color = activeRow?.driver?.teamColour
-    ? `#${activeRow.driver.teamColour}`
+    ? withHash(activeRow.driver.teamColour)
     : "#e00400";
 
   const hasData = Boolean(activeRow?.driver) && points.length > 1;
@@ -164,7 +165,7 @@ export function LapTimeChartSection({
           {classification.map((row) => {
             if (!row.driver) return null;
             const isSelected = activeDriverNumber === row.driverNumber;
-            const rowColor = row.driver.teamColour ? `#${row.driver.teamColour}` : "#888";
+            const rowColor = withHash(row.driver.teamColour, "#888");
             return (
               <button
                 key={row.driverNumber}
@@ -495,7 +496,7 @@ export function PitStopLog({ pitLog }: PitLogProps) {
           const duration = entry.stop.pitDuration;
           const isFastest = duration === fastestDuration;
           const color = entry.driver?.teamColour
-            ? `#${entry.driver.teamColour}`
+            ? withHash(entry.driver.teamColour)
             : "#555";
 
           // Relative within the session, floored so the quickest stop is still
@@ -592,7 +593,7 @@ export function ClassificationTable({ classification }: ClassificationTableProps
                       className="h-6 w-1 rounded-full"
                       style={{
                         backgroundColor: row.driver?.teamColour
-                          ? `#${row.driver.teamColour}`
+                          ? withHash(row.driver.teamColour)
                           : "#555",
                       }}
                     />
