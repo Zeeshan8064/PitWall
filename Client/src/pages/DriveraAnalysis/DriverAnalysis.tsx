@@ -190,8 +190,17 @@ export default function DriverAnalysis() {
     return { min: min - pad, max: max + pad };
   }, [delta]);
 
-  const leftColour = leftDriver?.teamColour ? `#${leftDriver.teamColour}` : "#e00400";
-  const rightColour = rightDriver?.teamColour ? `#${rightDriver.teamColour}` : "#3b82f6";
+  // The API already hands back colours with a leading "#", so blindly prefixing
+  // another one produced "##3671c6" — an invalid value that SVG silently drops,
+  // leaving the gap line unpainted.
+  const withHash = (colour: string | undefined, fallback: string) => {
+    if (!colour) return fallback;
+
+    return colour.startsWith("#") ? colour : `#${colour}`;
+  };
+
+  const leftColour = withHash(leftDriver?.teamColour, "#e00400");
+  const rightColour = withHash(rightDriver?.teamColour, "#3b82f6");
 
   const compare = (
     label: string,
